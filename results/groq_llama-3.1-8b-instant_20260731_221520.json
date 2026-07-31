@@ -1,0 +1,958 @@
+[
+  {
+    "strategy": "zero_shot",
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "metrics": {
+      "brand": 0.16666666666666666,
+      "color": 0.25,
+      "product_type": 0.08333333333333333,
+      "style": 0.0,
+      "material": 0.08333333333333333,
+      "model_number": 0.0,
+      "overall": 0.09722222222222222
+    },
+    "raw_outputs": [
+      {
+        "item_id": "B089N99KD1",
+        "raw": "{\n  \"brand\": \"Eono\",\n  \"color\": \"Rainbow\",\n  \"product_type\": \"Umbrella\",\n  \"style\": \"Double Layer Reverse Umbrella\",\n  \"material\": \"Carbon Fiber (Umbrella Frame), Water-Repellent Fabric (Outer Layer), UV-Coated Fabric (Outer Layer), Blackout Fabric (Inner Layer)\",\n  \"model_number\": \"Not specified\",\n  \"key_features\": [\n    \"Innovative design with reverse opening and closing\",\n    \"Double-layer fabric with water-repellent outer layer and UV-coated fabric\",\n    \"Carbon fiber umbrella frame for high strength and durability\",\n    \"C-shaped handle for easy grip and hands-free use\",\n    \"100% customer satisfaction guarantee\"\n  ]\n}",
+        "pred": {
+          "brand": "Eono",
+          "color": "Rainbow",
+          "product_type": "Umbrella",
+          "style": "Double Layer Reverse Umbrella",
+          "material": "Carbon Fiber (Umbrella Frame), Water-Repellent Fabric (Outer Layer), UV-Coated Fabric (Outer Layer), Blackout Fabric (Inner Layer)",
+          "model_number": "Not specified",
+          "key_features": [
+            "Innovative design with reverse opening and closing",
+            "Double-layer fabric with water-repellent outer layer and UV-coated fabric",
+            "Carbon fiber umbrella frame for high strength and durability",
+            "C-shaped handle for easy grip and hands-free use",
+            "100% customer satisfaction guarantee"
+          ]
+        }
+      },
+      {
+        "item_id": "B081HNH45N",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": null,\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer Heart Design\",\n  \"material\": \"3D Printed Hard Back Case\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Snug fit for Mobile, with perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Xiaomi Redmi Note 8 Pro\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\",\n    \"Stylish design and appearance, express your unique personality.\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": null,
+          "product_type": "Mobile Cover",
+          "style": "Designer Heart Design",
+          "material": "3D Printed Hard Back Case",
+          "model_number": null,
+          "key_features": [
+            "Snug fit for Mobile, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Xiaomi Redmi Note 8 Pro",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B07FRM1JXK",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"Black\",\n  \"product_type\": \"Laptop Backpack\",\n  \"style\": \"Urban\",\n  \"material\": \"Polyester\",\n  \"model_number\": \"29 litres\",\n  \"key_features\": [\n    \"Spacious 29 litre laptop backpack sized 31cm x 20cm x 47cm (LxBxH)\",\n    \"3 compartments, including a padded laptop compartment ideal for carrying laptops up to 15.6 inches\",\n    \"Made from water resistant, wear-resistant & durable polyester\",\n    \"Wide & cushioned shoulder strap for comfort\",\n    \"Well padded at the back to provide support\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "Black",
+          "product_type": "Laptop Backpack",
+          "style": "Urban",
+          "material": "Polyester",
+          "model_number": "29 litres",
+          "key_features": [
+            "Spacious 29 litre laptop backpack sized 31cm x 20cm x 47cm (LxBxH)",
+            "3 compartments, including a padded laptop compartment ideal for carrying laptops up to 15.6 inches",
+            "Made from water resistant, wear-resistant & durable polyester",
+            "Wide & cushioned shoulder strap for comfort",
+            "Well padded at the back to provide support"
+          ]
+        }
+      },
+      {
+        "item_id": "B07NZV3BT2",
+        "raw": "{\n  \"brand\": \"Amazon Brand\",\n  \"color\": null,\n  \"product_type\": \"Coffee Pods\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Fragrant light roast coffee with delicate flavor\",\n    \"A hot, sweet and rich cup of light roast coffee that has the aroma and flavor of creamy vanilla\",\n    \"100% Arabica coffee\",\n    \"Compatible with 1.0 and 2.0 k-cup brewers\",\n    \"If you like Dunkin' Donuts coffee, we invite you to try Happy Belly pods\"\n  ]\n}",
+        "pred": {
+          "brand": "Amazon Brand",
+          "color": null,
+          "product_type": "Coffee Pods",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Fragrant light roast coffee with delicate flavor",
+            "A hot, sweet and rich cup of light roast coffee that has the aroma and flavor of creamy vanilla",
+            "100% Arabica coffee",
+            "Compatible with 1.0 and 2.0 k-cup brewers",
+            "If you like Dunkin' Donuts coffee, we invite you to try Happy Belly pods"
+          ]
+        }
+      },
+      {
+        "item_id": "B074MGZ436",
+        "raw": "{\n  \"brand\": \"365 Everyday Value\",\n  \"color\": null,\n  \"product_type\": \"Pinto Beans\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Brought to you by Whole Foods Market\",\n    \"Pinto Beans are a naturally fat free food\",\n    \"Non-BPA lining\",\n    \"Fat Free, Low Sodium, No Salt Added, No Sugar Added\",\n    \"Certified Non-GMO, Certified Vegan\"\n  ]\n}",
+        "pred": {
+          "brand": "365 Everyday Value",
+          "color": null,
+          "product_type": "Pinto Beans",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Brought to you by Whole Foods Market",
+            "Pinto Beans are a naturally fat free food",
+            "Non-BPA lining",
+            "Fat Free, Low Sodium, No Salt Added, No Sugar Added",
+            "Certified Non-GMO, Certified Vegan"
+          ]
+        }
+      },
+      {
+        "item_id": "B08569YM3Y",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"Designer Love Couples Pattern\",\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"UV Printed Soft Back Case\",\n  \"material\": \"Soft\",\n  \"model_number\": \"Not specified\",\n  \"key_features\": [\n    \"Snug fit for Karbonn K9 Viraat, with perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Karbonn K9 Viraat\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Stylish design and appearance, express your unique personality\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "Designer Love Couples Pattern",
+          "product_type": "Mobile Cover",
+          "style": "UV Printed Soft Back Case",
+          "material": "Soft",
+          "model_number": "Not specified",
+          "key_features": [
+            "Snug fit for Karbonn K9 Viraat, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Karbonn K9 Viraat",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Stylish design and appearance, express your unique personality",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      },
+      {
+        "item_id": "B0779D4BTN",
+        "raw": "{\n  \"brand\": \"Basic Care\",\n  \"color\": null,\n  \"product_type\": \"Tablets\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Temporarily relieves headaches and everyday aches & pains\",\n    \"Pain reliever and fever reducer\",\n    \"Gluten free\",\n    \"Caffeine free\",\n    \"Dye free\"\n  ]\n}",
+        "pred": {
+          "brand": "Basic Care",
+          "color": null,
+          "product_type": "Tablets",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Temporarily relieves headaches and everyday aches & pains",
+            "Pain reliever and fever reducer",
+            "Gluten free",
+            "Caffeine free",
+            "Dye free"
+          ]
+        }
+      },
+      {
+        "item_id": "B07FR9Q149",
+        "raw": "{\n  \"brand\": \"Marca Amazon\",\n  \"color\": \"Rosa (Blush Blh)\",\n  \"product_type\": \"Zapatillas mullidas de una sola tira\",\n  \"style\": \"para mujer\",\n  \"material\": \"piel sintética de lujo con forro polar suave\",\n  \"model_number\": \"37 EU\",\n  \"key_features\": [\"Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad\", \"Parte superior de piel sintética de lujo con forro polar suave\"]\n}",
+        "pred": {
+          "brand": "Marca Amazon",
+          "color": "Rosa (Blush Blh)",
+          "product_type": "Zapatillas mullidas de una sola tira",
+          "style": "para mujer",
+          "material": "piel sintética de lujo con forro polar suave",
+          "model_number": "37 EU",
+          "key_features": [
+            "Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad",
+            "Parte superior de piel sintética de lujo con forro polar suave"
+          ]
+        }
+      },
+      {
+        "item_id": "B07QN64SM7",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"Purple and Gray\",\n  \"product_type\": \"Hard Back Case Mobile Cover\",\n  \"style\": \"Designer\",\n  \"material\": \"3D Printed\",\n  \"model_number\": \"for Huawei Honor 8X\",\n  \"key_features\": [\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\",\n    \"Stylish design and appearance, express your unique personality.\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "Purple and Gray",
+          "product_type": "Hard Back Case Mobile Cover",
+          "style": "Designer",
+          "material": "3D Printed",
+          "model_number": "for Huawei Honor 8X",
+          "key_features": [
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B079PY4GLR",
+        "raw": "{\n  \"brand\": \"Starter\",\n  \"color\": \"White\",\n  \"product_type\": \"Men's Fitted Cap\",\n  \"style\": \"Performance Hat\",\n  \"material\": \"Active-inspired mesh fabric\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Starter hangtag doubles as a sticker!\",\n    \"Curved visor to keep the sun out of your eyes\",\n    \"Wicking sweatband to keep sweat off your face\",\n    \"DRI-STAR technology to keep you cool and dry\",\n    \"Rubberized logo on front\",\n    \"Breathable mesh fabric\"\n  ]\n}",
+        "pred": {
+          "brand": "Starter",
+          "color": "White",
+          "product_type": "Men's Fitted Cap",
+          "style": "Performance Hat",
+          "material": "Active-inspired mesh fabric",
+          "model_number": null,
+          "key_features": [
+            "Starter hangtag doubles as a sticker!",
+            "Curved visor to keep the sun out of your eyes",
+            "Wicking sweatband to keep sweat off your face",
+            "DRI-STAR technology to keep you cool and dry",
+            "Rubberized logo on front",
+            "Breathable mesh fabric"
+          ]
+        }
+      },
+      {
+        "item_id": "B01MS62TLU",
+        "raw": "{\n  \"brand\": \"find. Amazon Brand\",\n  \"color\": \"Gris\",\n  \"product_type\": \"Zapatos clásicos formales\",\n  \"style\": \"Brogue de Piel con Cordones\",\n  \"material\": \"Piel\",\n  \"model_number\": \"12 M UK\",\n  \"key_features\": [\"Detalle de corte de los dedos\", \"Suela ligera pero duradera\"]\n}",
+        "pred": {
+          "brand": "find. Amazon Brand",
+          "color": "Gris",
+          "product_type": "Zapatos clásicos formales",
+          "style": "Brogue de Piel con Cordones",
+          "material": "Piel",
+          "model_number": "12 M UK",
+          "key_features": [
+            "Detalle de corte de los dedos",
+            "Suela ligera pero duradera"
+          ]
+        }
+      },
+      {
+        "item_id": "B0857M4NR7",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"UV Printed\",\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer Couples Standing in Rain\",\n  \"material\": \"Soft Back Case\",\n  \"model_number\": \"Vivo V3\",\n  \"key_features\": [\n    \"Snug fit for Vivo V3, with perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Vivo V3\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\",\n    \"Stylish design and appearance, express your unique personality.\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "UV Printed",
+          "product_type": "Mobile Cover",
+          "style": "Designer Couples Standing in Rain",
+          "material": "Soft Back Case",
+          "model_number": "Vivo V3",
+          "key_features": [
+            "Snug fit for Vivo V3, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Vivo V3",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "strategy": "few_shot",
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "metrics": {
+      "brand": 0.75,
+      "color": 0.4166666666666667,
+      "product_type": 0.8333333333333334,
+      "style": 0.08333333333333333,
+      "material": 0.16666666666666666,
+      "model_number": 0.25,
+      "overall": 0.4166666666666666
+    },
+    "raw_outputs": [
+      {
+        "item_id": "B089N99KD1",
+        "raw": "{\"brand\": \"Eono(イオーノ)\", \"color\": \"レインボウ\", \"product_type\": \"UMBRELLA\", \"style\": null, \"material\": null, \"model_number\": \"U05-Rain Bow\", \"key_features\": [\"【革新なデザイン】従来の傘と違い、逆に開き逆に閉じる長傘です。濡れた外側が内側に収まるため、床、衣服を濡れた、周りの人に迷惑上下車めんどうは全部解消できます。特殊な逆さまな折りたたみ式から、掛けるところがない時に自立てができます。とても便利です。\", \"【２重生地】２重生地を使っています。外側生地は撥水が強く、UV塗装もあります。２重構造から、紫外線を２倍にカットします。内側生地も遮光遮熱です。傘の表面はハスの葉のような型で、雨水が傘の上に留まりません。内側の生地は穴があり、レーザー加工でつ作られます。風はこの穴で逃がして、暴風雨も安心して使えます。内側の傘２重生地の色が違い、内側に様々な模様があります。おしゃれで、綺麗です\", \"【耐強風の傘骨】炭素繊維で傘骨を利用します。折れにくい高強靭性の傘骨、強風の時でも安心で使います。さび付きもご心配しません。安全なボタン式手動開閉の操作は手が怪我しません。\", \"【C型手元】逆さ傘は独特なC型の手元は、手首にかけると両手を解放し、長傘をさしながら両手が使えます。スマホの操作、荷物を持ち、お子さまの抱っこなど大変便利です。\", \"【100％顧客満足度】初期不良・使用中の自然故障等万一この期間中に製品がご利用頂けなくなった場合は、交換対応を提供致します（通常使用での製品不良に限ります）。商品について何か疑問点ありましたら、いつでもお気軽にご連絡ください。\"]}",
+        "pred": {
+          "brand": "Eono(イオーノ)",
+          "color": "レインボウ",
+          "product_type": "UMBRELLA",
+          "style": null,
+          "material": null,
+          "model_number": "U05-Rain Bow",
+          "key_features": [
+            "【革新なデザイン】従来の傘と違い、逆に開き逆に閉じる長傘です。濡れた外側が内側に収まるため、床、衣服を濡れた、周りの人に迷惑上下車めんどうは全部解消できます。特殊な逆さまな折りたたみ式から、掛けるところがない時に自立てができます。とても便利です。",
+            "【２重生地】２重生地を使っています。外側生地は撥水が強く、UV塗装もあります。２重構造から、紫外線を２倍にカットします。内側生地も遮光遮熱です。傘の表面はハスの葉のような型で、雨水が傘の上に留まりません。内側の生地は穴があり、レーザー加工でつ作られます。風はこの穴で逃がして、暴風雨も安心して使えます。内側の傘２重生地の色が違い、内側に様々な模様があります。おしゃれで、綺麗です",
+            "【耐強風の傘骨】炭素繊維で傘骨を利用します。折れにくい高強靭性の傘骨、強風の時でも安心で使います。さび付きもご心配しません。安全なボタン式手動開閉の操作は手が怪我しません。",
+            "【C型手元】逆さ傘は独特なC型の手元は、手首にかけると両手を解放し、長傘をさしながら両手が使えます。スマホの操作、荷物を持ち、お子さまの抱っこなど大変便利です。",
+            "【100％顧客満足度】初期不良・使用中の自然故障等万一この期間中に製品がご利用頂けなくなった場合は、交換対応を提供致します（通常使用での製品不良に限ります）。商品について何か疑問点ありましたら、いつでもお気軽にご連絡ください。"
+          ]
+        }
+      },
+      {
+        "item_id": "B081HNH45N",
+        "raw": "{\"brand\": \"Amazon Brand - Solimo\", \"color\": \"multi-colored\", \"product_type\": \"CELLULAR_PHONE_CASE\", \"style\": null, \"material\": \"Plastic\", \"model_number\": \"SOLRN8PRO3DM83\", \"key_features\": [\"Snug fit for Mobile, with perfect cut-outs for volume buttons, audio and charging ports\", \"Compatible with Xiaomi Redmi Note 8 Pro\", \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\", \"Stylish design and appearance, express your unique personality.\", \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "multi-colored",
+          "product_type": "CELLULAR_PHONE_CASE",
+          "style": null,
+          "material": "Plastic",
+          "model_number": "SOLRN8PRO3DM83",
+          "key_features": [
+            "Snug fit for Mobile, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Xiaomi Redmi Note 8 Pro",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B07FRM1JXK",
+        "raw": "{\"brand\": \"Amazon Brand - Solimo\", \"color\": \"Black\", \"product_type\": \"BACKPACK\", \"style\": \"Traditional Backpacks\", \"material\": \"Polyester\", \"model_number\": \"Sol_Lgge_69\", \"key_features\": [\"Spacious 29 litre laptop backpack sized 31cm x 20cm x 47cm (LxBxH)\", \"3 compartments, including a padded laptop compartment ideal for carrying laptops up to 15.6 inches\", \"Made from water resistant, wear-resistant & durable polyester\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Black",
+          "product_type": "BACKPACK",
+          "style": "Traditional Backpacks",
+          "material": "Polyester",
+          "model_number": "Sol_Lgge_69",
+          "key_features": [
+            "Spacious 29 litre laptop backpack sized 31cm x 20cm x 47cm (LxBxH)",
+            "3 compartments, including a padded laptop compartment ideal for carrying laptops up to 15.6 inches",
+            "Made from water resistant, wear-resistant & durable polyester"
+          ]
+        }
+      },
+      {
+        "item_id": "B07NZV3BT2",
+        "raw": "{\"brand\": \"Happy Belly\", \"color\": null, \"product_type\": \"COFFEE\", \"style\": null, \"material\": null, \"model_number\": null, \"key_features\": [\"100 French Vanilla Flavored k cup pods, packaging may vary\", \"Happy Belly coffee pods are filled with coffee carefully sourced from select farms worldwide so each cup tastes uniquely delicious.\", \"Settle in with the warming aroma and smooth flavors of delicious coffee at anytime so you can relax with a Happy Belly all day, everyday.\", \"Fragrant light roast coffee with delicate flavor\", \"A hot, sweet and rich cup of light roast coffee that has the aroma and flavor of creamy vanilla.\", \"100% Arabica coffee\", \"Compatible with 1.0 and 2.0 k-cup brewers, our simple Happy Belly coffee pods allow you to enjoy a satisfying brew with ease and calm.\", \"If you like Dunkin' Donuts coffee, we invite you to try Happy Belly pods\", \"Satisfaction Guarantee: We're proud of our products. If you aren't satisfied, we'll refund you for any reason within a year of purchase. 1-877-485-0385\"]}",
+        "pred": {
+          "brand": "Happy Belly",
+          "color": null,
+          "product_type": "COFFEE",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "100 French Vanilla Flavored k cup pods, packaging may vary",
+            "Happy Belly coffee pods are filled with coffee carefully sourced from select farms worldwide so each cup tastes uniquely delicious.",
+            "Settle in with the warming aroma and smooth flavors of delicious coffee at anytime so you can relax with a Happy Belly all day, everyday.",
+            "Fragrant light roast coffee with delicate flavor",
+            "A hot, sweet and rich cup of light roast coffee that has the aroma and flavor of creamy vanilla.",
+            "100% Arabica coffee",
+            "Compatible with 1.0 and 2.0 k-cup brewers, our simple Happy Belly coffee pods allow you to enjoy a satisfying brew with ease and calm.",
+            "If you like Dunkin' Donuts coffee, we invite you to try Happy Belly pods",
+            "Satisfaction Guarantee: We're proud of our products. If you aren't satisfied, we'll refund you for any reason within a year of purchase. 1-877-485-0385"
+          ]
+        }
+      },
+      {
+        "item_id": "B074MGZ436",
+        "raw": "{\"brand\": \"365 Everyday Value\", \"color\": null, \"product_type\": \"BEANS\", \"style\": null, \"material\": null, \"model_number\": null, \"key_features\": [\"Brought to you by Whole Foods Market. The packaging for this product has a fresh new look. During this transition, you may get the original packaging or the new packaging in your order, but the product and quality is staying exactly the same. Enjoy!\", \"Pinto Beans are a naturally fat free food.\", \"Non-BPA lining.\", \"Fat Free, Low Sodium, No Salt Added, No Sugar Added.\", \"Certified Non-GMO, Certified Vegan.\"]}",
+        "pred": {
+          "brand": "365 Everyday Value",
+          "color": null,
+          "product_type": "BEANS",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Brought to you by Whole Foods Market. The packaging for this product has a fresh new look. During this transition, you may get the original packaging or the new packaging in your order, but the product and quality is staying exactly the same. Enjoy!",
+            "Pinto Beans are a naturally fat free food.",
+            "Non-BPA lining.",
+            "Fat Free, Low Sodium, No Salt Added, No Sugar Added.",
+            "Certified Non-GMO, Certified Vegan."
+          ]
+        }
+      },
+      {
+        "item_id": "B08569YM3Y",
+        "raw": "{\"brand\": \"Amazon Brand - Solimo\", \"color\": null, \"product_type\": \"CELLULAR_PHONE_CASE\", \"style\": null, \"material\": \"Soft Plastic\", \"model_number\": \"SOLK9VIRUV83\", \"key_features\": [\"Snug fit for Karbonn K9 Viraat, with perfect cut-outs for volume buttons, audio and charging ports\", \"Compatible with Karbonn K9 Viraat\", \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\", \"Stylish design and appearance, express your unique personality.\", \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": null,
+          "product_type": "CELLULAR_PHONE_CASE",
+          "style": null,
+          "material": "Soft Plastic",
+          "model_number": "SOLK9VIRUV83",
+          "key_features": [
+            "Snug fit for Karbonn K9 Viraat, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Karbonn K9 Viraat",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B0779D4BTN",
+        "raw": "{\"brand\": \"Basic Care\", \"color\": null, \"product_type\": \"ASPIRIN_TABLETS\", \"style\": null, \"material\": null, \"model_number\": null, \"key_features\": [\"Active ingredient: The active ingredient is aspirin 325 mg, a regular strength nonsteroidal anti-inflammatory drug in coated tablets. Compare to Bayer aspirin active ingredient.\", \"Safe pain relief plus lifesaving benefits. Talk to your doctor or other healthcare provider before using aspirin 325 mg regular strength coated tablets for your heart.\", \"Headache, arthritis and muscle pain can cause annoying discomfort any time of day. Basic Care aspirin 325 mg coated tablets Contain a nonsteroidal anti-inflammatory drug (NSAID) that temporarily relieves headaches and everyday Aches & pains.\", \"Caffeine & dye free: This Product is a coated tablet containing aspirin 325 mg, a pain reliever and fever reducer. This product is Gluten free, as well as Caffeine and dye free.\", \"Aspirin is in a class of analgesics, or pain relievers, called nonsteroidal anti-inflammatory drugs. Use for adults and children 12 years and over.\"]}",
+        "pred": {
+          "brand": "Basic Care",
+          "color": null,
+          "product_type": "ASPIRIN_TABLETS",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Active ingredient: The active ingredient is aspirin 325 mg, a regular strength nonsteroidal anti-inflammatory drug in coated tablets. Compare to Bayer aspirin active ingredient.",
+            "Safe pain relief plus lifesaving benefits. Talk to your doctor or other healthcare provider before using aspirin 325 mg regular strength coated tablets for your heart.",
+            "Headache, arthritis and muscle pain can cause annoying discomfort any time of day. Basic Care aspirin 325 mg coated tablets Contain a nonsteroidal anti-inflammatory drug (NSAID) that temporarily relieves headaches and everyday Aches & pains.",
+            "Caffeine & dye free: This Product is a coated tablet containing aspirin 325 mg, a pain reliever and fever reducer. This product is Gluten free, as well as Caffeine and dye free.",
+            "Aspirin is in a class of analgesics, or pain relievers, called nonsteroidal anti-inflammatory drugs. Use for adults and children 12 years and over."
+          ]
+        }
+      },
+      {
+        "item_id": "B07FR9Q149",
+        "raw": "{\"brand\": \"Amazon Brand - Mae\", \"color\": \"Rosa (Blush Blh)\", \"product_type\": \"SHOES\", \"style\": null, \"material\": \"Synthetic Leather\", \"model_number\": null, \"key_features\": [\"Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad.\", \"Parte superior de piel sintética de lujo con forro polar suave.\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Mae",
+          "color": "Rosa (Blush Blh)",
+          "product_type": "SHOES",
+          "style": null,
+          "material": "Synthetic Leather",
+          "model_number": null,
+          "key_features": [
+            "Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad.",
+            "Parte superior de piel sintética de lujo con forro polar suave."
+          ]
+        }
+      },
+      {
+        "item_id": "B07QN64SM7",
+        "raw": "{\"brand\": \"Amazon Brand - Solimo\", \"color\": \"Purple and Gray\", \"product_type\": \"CELLULAR_PHONE_CASE\", \"style\": null, \"material\": \"Plastic\", \"model_number\": \"SOLH8X3DM83\", \"key_features\": [\"3D Printed Hard Back Case Mobile Cover for Huawei Honor 8X\", \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\", \"Stylish design and appearance, express your unique personality.\", \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Purple and Gray",
+          "product_type": "CELLULAR_PHONE_CASE",
+          "style": null,
+          "material": "Plastic",
+          "model_number": "SOLH8X3DM83",
+          "key_features": [
+            "3D Printed Hard Back Case Mobile Cover for Huawei Honor 8X",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B079PY4GLR",
+        "raw": "{\"brand\": \"Starter\", \"color\": \"White\", \"product_type\": \"HAT\", \"style\": null, \"material\": null, \"model_number\": null, \"key_features\": [\"Starter hangtag doubles as a sticker!\", \"This lightweight 6-panel performance hat keeps the sun out of your eyes with its curved visor and the sweat off of your face with its wicking sweatband. This fitted cap wicks away moisture to keep you cool and dry during your workout or run, and a comfortable sweat-free fit with its STAR-FIT headband.\", \"DRI-STAR technology wicks away moisture to keep you cool and dry during your run or workout\", \"Rubberized logo on front\", \"Active-inspired mesh fabric for breathability\"]}",
+        "pred": {
+          "brand": "Starter",
+          "color": "White",
+          "product_type": "HAT",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Starter hangtag doubles as a sticker!",
+            "This lightweight 6-panel performance hat keeps the sun out of your eyes with its curved visor and the sweat off of your face with its wicking sweatband. This fitted cap wicks away moisture to keep you cool and dry during your workout or run, and a comfortable sweat-free fit with its STAR-FIT headband.",
+            "DRI-STAR technology wicks away moisture to keep you cool and dry during your run or workout",
+            "Rubberized logo on front",
+            "Active-inspired mesh fabric for breathability"
+          ]
+        }
+      },
+      {
+        "item_id": "B01MS62TLU",
+        "raw": "{\"brand\": \"find. Amazon Brand\", \"color\": \"Gris\", \"product_type\": \"SHOES\", \"style\": \"Formal\", \"material\": \"Leather\", \"model_number\": \"Brogue de Piel con Cordones para Hombre, Gris, 12 M UK\", \"key_features\": [\"Zapatos clásicos formales\", \"Detalle de corte de los dedos\", \"Suela ligera pero duradera.\"]}",
+        "pred": {
+          "brand": "find. Amazon Brand",
+          "color": "Gris",
+          "product_type": "SHOES",
+          "style": "Formal",
+          "material": "Leather",
+          "model_number": "Brogue de Piel con Cordones para Hombre, Gris, 12 M UK",
+          "key_features": [
+            "Zapatos clásicos formales",
+            "Detalle de corte de los dedos",
+            "Suela ligera pero duradera."
+          ]
+        }
+      },
+      {
+        "item_id": "B0857M4NR7",
+        "raw": "{\"brand\": \"Amazon Brand - Solimo\", \"color\": null, \"product_type\": \"CELLULAR_PHONE_CASE\", \"style\": null, \"material\": \"Soft\", \"model_number\": \"Sol_V3_Soft\", \"key_features\": [\"Snug fit for Vivo V3, with perfect cut-outs for volume buttons, audio and charging ports\", \"Compatible with Vivo V3\", \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\", \"Stylish design and appearance, express your unique personality.\", \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"]}",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": null,
+          "product_type": "CELLULAR_PHONE_CASE",
+          "style": null,
+          "material": "Soft",
+          "model_number": "Sol_V3_Soft",
+          "key_features": [
+            "Snug fit for Vivo V3, with perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Vivo V3",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "strategy": "cot",
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "metrics": {
+      "brand": 0.5833333333333334,
+      "color": 0.16666666666666666,
+      "product_type": 0.16666666666666666,
+      "style": 0.0,
+      "material": 0.0,
+      "model_number": 0.0,
+      "overall": 0.1527777777777778
+    },
+    "raw_outputs": [
+      {
+        "item_id": "B089N99KD1",
+        "raw": "Based on the given information, here's the step-by-step analysis:\n\n1. **Identify the brand**: The brand is Amazonブランド (Amazon Brand) Eono (イオーノ).\n2. **Identify the color**: The color is not explicitly mentioned, but it's mentioned that the inside of the umbrella has a rainbow pattern (ズ レインボウ).\n3. **Identify the product type**: The product type is an umbrella (傘).\n4. **Identify style**: The style is a double-layer, reversible umbrella with a unique C-shaped handle.\n5. **Identify material**: The material is not explicitly mentioned, but it's mentioned that the umbrella has a double-layer structure with a water-repellent outer layer and a UV-coated inner layer.\n6. **Identify model number**: The model number is not mentioned.\n7. **List 2-4 key features**:\n\t* Reversible design with a unique folding mechanism\n\t* Double-layer structure with a water-repellent outer layer and a UV-coated inner layer\n\t* C-shaped handle for easy use\n\t* Wind-resistant design with a carbon fiber frame\n\nHere's the final JSON object:\n\n```json\n{\n  \"brand\": \"Amazonブランド Eono (イオーノ)\",\n  \"color\": \"Rainbow\",\n  \"product_type\": \"Umbrella\",\n  \"style\": \"Double-layer, Reversible, C-shaped handle\",\n  \"material\": \"Double-layer structure with water-repellent outer layer and UV-coated inner layer\",\n  \"model_number\": \"N/A\",\n  \"key_features\": [\n    \"Reversible design with unique folding mechanism\",\n    \"Double-layer structure with water-repellent outer layer and UV-coated inner layer\",\n    \"C-shaped handle for easy use\",\n    \"Wind-resistant design with carbon fiber frame\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazonブランド Eono (イオーノ)",
+          "color": "Rainbow",
+          "product_type": "Umbrella",
+          "style": "Double-layer, Reversible, C-shaped handle",
+          "material": "Double-layer structure with water-repellent outer layer and UV-coated inner layer",
+          "model_number": "N/A",
+          "key_features": [
+            "Reversible design with unique folding mechanism",
+            "Double-layer structure with water-repellent outer layer and UV-coated inner layer",
+            "C-shaped handle for easy use",
+            "Wind-resistant design with carbon fiber frame"
+          ]
+        }
+      },
+      {
+        "item_id": "B081HNH45N",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: Amazon Brand - Solimo\n2. **Identify the color**: Not mentioned\n3. **Identify the product type**: Mobile case or cover\n4. **Identify style**: Designer, Heart Design, 3D Printed, Hard Back Case\n5. **Identify material**: 3D Printed (likely plastic)\n6. **Identify model number**: Not mentioned\n7. **List 2-4 key features**:\n   - Snug fit for Mobile\n   - Compatible with Xiaomi Redmi Note 8 Pro\n   - Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\n   - Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\n\nNow, here is the final JSON object:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Solimo\",\n  \"color\": \"Not mentioned\",\n  \"product_type\": \"Mobile case or cover\",\n  \"style\": \"Designer, Heart Design, 3D Printed, Hard Back Case\",\n  \"material\": \"3D Printed (likely plastic)\",\n  \"model_number\": \"Not mentioned\",\n  \"key_features\": [\n    \"Snug fit for Mobile\",\n    \"Compatible with Xiaomi Redmi Note 8 Pro\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Not mentioned",
+          "product_type": "Mobile case or cover",
+          "style": "Designer, Heart Design, 3D Printed, Hard Back Case",
+          "material": "3D Printed (likely plastic)",
+          "model_number": "Not mentioned",
+          "key_features": [
+            "Snug fit for Mobile",
+            "Compatible with Xiaomi Redmi Note 8 Pro",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      },
+      {
+        "item_id": "B07FRM1JXK",
+        "raw": "Here's the step-by-step reasoning:\n\n1. **Identify the brand**: The brand is Amazon Brand - Solimo.\n2. **Identify the color**: The color is Black.\n3. **Identify the product type**: The product type is a Laptop Backpack.\n4. **Identify style**: The style is Urban.\n5. **Identify material**: The material is polyester, which is described as water resistant, wear-resistant, and durable.\n6. **Identify model number**: There is no specific model number mentioned in the product title or description.\n7. **List 2-4 key features**:\n   - Spacious 29 litre laptop backpack\n   - 3 compartments, including a padded laptop compartment\n   - Wide & cushioned shoulder strap for comfort\n   - Well padded at the back to provide support\n\nNow, here's the final JSON object:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Solimo\",\n  \"color\": \"Black\",\n  \"product_type\": \"Laptop Backpack\",\n  \"style\": \"Urban\",\n  \"material\": \"water resistant, wear-resistant, and durable polyester\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Spacious 29 litre laptop backpack\",\n    \"3 compartments, including a padded laptop compartment\",\n    \"Wide & cushioned shoulder strap for comfort\",\n    \"Well padded at the back to provide support\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Black",
+          "product_type": "Laptop Backpack",
+          "style": "Urban",
+          "material": "water resistant, wear-resistant, and durable polyester",
+          "model_number": null,
+          "key_features": [
+            "Spacious 29 litre laptop backpack",
+            "3 compartments, including a padded laptop compartment",
+            "Wide & cushioned shoulder strap for comfort",
+            "Well padded at the back to provide support"
+          ]
+        }
+      },
+      {
+        "item_id": "B07NZV3BT2",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: The brand is Amazon Brand, specifically the Happy Belly brand.\n2. **Identify the color**: The color is not explicitly mentioned, but the product type is light roast coffee, which is often associated with a light brown color.\n3. **Identify the product type**: The product type is coffee pods.\n4. **Identify style**: The style is French Vanilla Flavored.\n5. **Identify material**: The material is not explicitly mentioned, but it is likely a paper or plastic material for the coffee pods.\n6. **Identify model number**: The model number is not explicitly mentioned, but the product is compatible with Keurig 2.0 K-Cup Brewers, which suggests a specific model number for the coffee pods.\n7. **List 2-4 key features**:\n   - 100% Arabica coffee\n   - Fragrant light roast coffee with delicate flavor\n   - Compatible with 1.0 and 2.0 k-cup brewers\n   - Satisfaction Guarantee\n\nNow, here is the final JSON object with the extracted product attributes:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Happy Belly\",\n  \"color\": \"Light Brown\",\n  \"product_type\": \"Coffee Pods\",\n  \"style\": \"French Vanilla Flavored\",\n  \"material\": \"Paper or Plastic\",\n  \"model_number\": \"Compatible with Keurig 2.0 K-Cup Brewers\",\n  \"key_features\": [\n    \"100% Arabica coffee\",\n    \"Fragrant light roast coffee with delicate flavor\",\n    \"Compatible with 1.0 and 2.0 k-cup brewers\",\n    \"Satisfaction Guarantee\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Happy Belly",
+          "color": "Light Brown",
+          "product_type": "Coffee Pods",
+          "style": "French Vanilla Flavored",
+          "material": "Paper or Plastic",
+          "model_number": "Compatible with Keurig 2.0 K-Cup Brewers",
+          "key_features": [
+            "100% Arabica coffee",
+            "Fragrant light roast coffee with delicate flavor",
+            "Compatible with 1.0 and 2.0 k-cup brewers",
+            "Satisfaction Guarantee"
+          ]
+        }
+      },
+      {
+        "item_id": "B074MGZ436",
+        "raw": "To extract the product attributes step by step, I'll follow the given instructions:\n\n1. **Identify the brand**: The brand is \"365 Everyday Value\" which is brought to you by \"Whole Foods Market\".\n\n2. **Identify the color**: Unfortunately, the color is not mentioned in the given information.\n\n3. **Identify the product type**: The product type is \"Pinto Beans\".\n\n4. **Identify style**: The style is \"No Salt Added\".\n\n5. **Identify material**: Unfortunately, the material is not mentioned in the given information.\n\n6. **Identify model number**: The model number is not explicitly mentioned, but the size is given as \"15.5 oz\".\n\n7. **List 2-4 key features**: The key features are:\n   - Fat Free\n   - Low Sodium\n   - No Salt Added\n   - Non-BPA lining\n   - Certified Non-GMO\n   - Certified Vegan\n\nNow, I'll return the final JSON object with the extracted attributes:\n\n```json\n{\n  \"brand\": \"365 Everyday Value (Whole Foods Market)\",\n  \"color\": \"Not mentioned\",\n  \"product_type\": \"Pinto Beans\",\n  \"style\": \"No Salt Added\",\n  \"material\": \"Not mentioned\",\n  \"model_number\": \"15.5 oz\",\n  \"key_features\": [\n    \"Fat Free\",\n    \"Low Sodium\",\n    \"No Salt Added\",\n    \"Non-BPA lining\",\n    \"Certified Non-GMO\",\n    \"Certified Vegan\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "365 Everyday Value (Whole Foods Market)",
+          "color": "Not mentioned",
+          "product_type": "Pinto Beans",
+          "style": "No Salt Added",
+          "material": "Not mentioned",
+          "model_number": "15.5 oz",
+          "key_features": [
+            "Fat Free",
+            "Low Sodium",
+            "No Salt Added",
+            "Non-BPA lining",
+            "Certified Non-GMO",
+            "Certified Vegan"
+          ]
+        }
+      },
+      {
+        "item_id": "B08569YM3Y",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: The brand is Amazon Brand - Solimo.\n2. **Identify the color**: The color is not explicitly mentioned, but it can be inferred as \"Love Couples Pattern\" which is a design pattern rather than a specific color.\n3. **Identify the product type**: The product type is a mobile cover or case.\n4. **Identify style**: The style is described as \"Designer Love Couples Pattern\" which suggests a unique and stylish design.\n5. **Identify material**: The material is not explicitly mentioned, but it is described as \"Soft Back Case\" which suggests a soft and flexible material.\n6. **Identify model number**: The model number is Karbonn K9 Viraat.\n7. **List 2-4 key features**:\n   - Snug fit for Karbonn K9 Viraat\n   - Compatible with Karbonn K9 Viraat\n   - Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\n   - Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\n\nNow, here is the final JSON object with the extracted product attributes:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Solimo\",\n  \"color\": \"Love Couples Pattern\",\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer Love Couples Pattern\",\n  \"material\": \"Soft Back Case\",\n  \"model_number\": \"Karbonn K9 Viraat\",\n  \"key_features\": [\n    \"Snug fit for Karbonn K9 Viraat\",\n    \"Compatible with Karbonn K9 Viraat\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Love Couples Pattern",
+          "product_type": "Mobile Cover",
+          "style": "Designer Love Couples Pattern",
+          "material": "Soft Back Case",
+          "model_number": "Karbonn K9 Viraat",
+          "key_features": [
+            "Snug fit for Karbonn K9 Viraat",
+            "Compatible with Karbonn K9 Viraat",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      },
+      {
+        "item_id": "B0779D4BTN",
+        "raw": "To extract the product attributes step by step, we'll follow the given instructions:\n\n1. **Identify the brand**: The brand is Basic Care.\n2. **Identify the color**: The color is not explicitly mentioned, but it can be inferred that the tablets are likely white or off-white due to the description of being \"coated tablets.\" However, since the color is not explicitly stated, we'll leave it as \"Unknown.\"\n3. **Identify the product type**: The product type is Aspirin Regular Strength Tablets.\n4. **Identify style**: The style is not explicitly mentioned, but it can be inferred that the product is a coated tablet. However, since the style is not explicitly stated, we'll leave it as \"Unknown.\"\n5. **Identify material**: The material is not explicitly mentioned, but it can be inferred that the product is a tablet made of a pharmaceutical-grade material. However, since the material is not explicitly stated, we'll leave it as \"Unknown.\"\n6. **Identify model number**: The model number is not explicitly mentioned, but the product count is given as 500 Count. We'll leave the model number as \"Unknown.\"\n7. **List 2-4 key features**: The key features are:\n\t* Contains aspirin 325 mg, a regular strength nonsteroidal anti-inflammatory drug.\n\t* Temporarily relieves headaches and everyday aches & pains.\n\t* Caffeine & dye free.\n\t* Gluten free.\n\nNow, we'll return the final JSON object with the extracted attributes:\n\n```json\n{\n  \"brand\": \"Basic Care\",\n  \"color\": \"Unknown\",\n  \"product_type\": \"Aspirin Regular Strength Tablets\",\n  \"style\": \"Unknown\",\n  \"material\": \"Unknown\",\n  \"model_number\": \"Unknown\",\n  \"key_features\": [\n    \"Contains aspirin 325 mg, a regular strength nonsteroidal anti-inflammatory drug.\",\n    \"Temporarily relieves headaches and everyday aches & pains.\",\n    \"Caffeine & dye free.\",\n    \"Gluten free.\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Basic Care",
+          "color": "Unknown",
+          "product_type": "Aspirin Regular Strength Tablets",
+          "style": "Unknown",
+          "material": "Unknown",
+          "model_number": "Unknown",
+          "key_features": [
+            "Contains aspirin 325 mg, a regular strength nonsteroidal anti-inflammatory drug.",
+            "Temporarily relieves headaches and everyday aches & pains.",
+            "Caffeine & dye free.",
+            "Gluten free."
+          ]
+        }
+      },
+      {
+        "item_id": "B07FR9Q149",
+        "raw": "Here's the step-by-step extraction of product attributes:\n\n1. **Identify the brand**: Marca Amazon\n2. **Identify the color**: Rosa (Blush Blh)\n3. **Identify the product type**: Zapatillas (shoes)\n4. **Identify style**: mullidas de una sola tira (soft, single-strap design)\n5. **Identify material**: Parte superior de piel sintética de lujo (luxury synthetic leather) con forro polar suave (soft polar fleece lining)\n6. **Identify model number**: 37 EU (European size 37)\n7. **List 2-4 key features**:\n   - Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad (soft and fun shoes with open toe for greater comfort)\n   - Parte superior de piel sintética de lujo con forro polar suave (luxury synthetic leather upper with soft polar fleece lining)\n\nHere's the final JSON object:\n\n```json\n{\n  \"brand\": \"Marca Amazon\",\n  \"color\": \"Rosa (Blush Blh)\",\n  \"product_type\": \"Zapatillas\",\n  \"style\": \"mullidas de una sola tira\",\n  \"material\": \"Parte superior de piel sintética de lujo con forro polar suave\",\n  \"model_number\": \"37 EU\",\n  \"key_features\": [\n    \"Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad\",\n    \"Parte superior de piel sintética de lujo con forro polar suave\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Marca Amazon",
+          "color": "Rosa (Blush Blh)",
+          "product_type": "Zapatillas",
+          "style": "mullidas de una sola tira",
+          "material": "Parte superior de piel sintética de lujo con forro polar suave",
+          "model_number": "37 EU",
+          "key_features": [
+            "Zapatillas mullidas y divertidas con punta abierta diseñadas para una mayor comodidad",
+            "Parte superior de piel sintética de lujo con forro polar suave"
+          ]
+        }
+      },
+      {
+        "item_id": "B07QN64SM7",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: Amazon Brand - Solimo\n2. **Identify the color**: Purple and Gray\n3. **Identify the product type**: Mobile Cover\n4. **Identify style**: Designer, 3D Printed, Texture\n5. **Identify material**: Hard Back Case (made of 3D printed material, but the primary material is hard plastic)\n6. **Identify model number**: Huawei Honor 8X (this is the model number of the phone the case is designed for, not the case itself)\n7. **List 2-4 key features**:\n   - Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\n   - Stylish design and appearance, express your unique personality.\n   - Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\n\nNow, here is the final JSON object:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Solimo\",\n  \"color\": \"Purple and Gray\",\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer, 3D Printed, Texture\",\n  \"material\": \"Hard Back Case\",\n  \"model_number\": \"Huawei Honor 8X\",\n  \"key_features\": [\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\",\n    \"Stylish design and appearance, express your unique personality.\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "Purple and Gray",
+          "product_type": "Mobile Cover",
+          "style": "Designer, 3D Printed, Texture",
+          "material": "Hard Back Case",
+          "model_number": "Huawei Honor 8X",
+          "key_features": [
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B079PY4GLR",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: The brand is Starter.\n2. **Identify the color**: The color is White.\n3. **Identify the product type**: The product type is a hat or cap.\n4. **Identify style**: The style is Fitted.\n5. **Identify material**: The material is Active-inspired mesh fabric.\n6. **Identify model number**: There is no explicit model number mentioned in the product description.\n7. **List 2-4 key features**:\n   - Wicking sweatband to keep sweat off the face.\n   - DRI-STAR technology to wick away moisture.\n   - Rubberized logo on the front.\n   - Active-inspired mesh fabric for breathability.\n\nNow, here is the final JSON object with the extracted attributes:\n\n```json\n{\n  \"brand\": \"Starter\",\n  \"color\": \"White\",\n  \"product_type\": \"Hat/Cap\",\n  \"style\": \"Fitted\",\n  \"material\": \"Active-inspired mesh fabric\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Wicking sweatband to keep sweat off the face\",\n    \"DRI-STAR technology to wick away moisture\",\n    \"Rubberized logo on the front\",\n    \"Active-inspired mesh fabric for breathability\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Starter",
+          "color": "White",
+          "product_type": "Hat/Cap",
+          "style": "Fitted",
+          "material": "Active-inspired mesh fabric",
+          "model_number": null,
+          "key_features": [
+            "Wicking sweatband to keep sweat off the face",
+            "DRI-STAR technology to wick away moisture",
+            "Rubberized logo on the front",
+            "Active-inspired mesh fabric for breathability"
+          ]
+        }
+      },
+      {
+        "item_id": "B01MS62TLU",
+        "raw": "Here's the step-by-step process:\n\n1. **Identify the brand**: The brand is \"find. Amazon Brand\" (also known as Amazon Brand, but here it is \"find.\" which is a sub-brand of Amazon).\n\n2. **Identify the color**: The color is \"Gris\" (which translates to \"Grey\" in English).\n\n3. **Identify the product type**: The product type is \"Zapatos\" which translates to \"Shoes\" in English.\n\n4. **Identify style**: The style is \"Brogue de Piel con Cordones\" which translates to \"Brogue leather shoes with laces\" in English.\n\n5. **Identify material**: The material is \"Piel\" which translates to \"Leather\" in English.\n\n6. **Identify model number**: The model number is \"12 M UK\" which is a UK shoe size.\n\n7. **List 2-4 key features**: \n- \"Zapatos clásicos formales\" translates to \"Classic formal shoes\" in English.\n- \"Detalle de corte de los dedos\" translates to \"Toe cap detail\" in English.\n- \"Suela ligera pero duradera\" translates to \"Lightweight but durable sole\" in English.\n\nNow, here's the final JSON object:\n\n```json\n{\n  \"brand\": \"find. Amazon Brand\",\n  \"color\": \"Grey\",\n  \"product_type\": \"Shoes\",\n  \"style\": \"Brogue leather shoes with laces\",\n  \"material\": \"Leather\",\n  \"model_number\": \"12 M UK\",\n  \"key_features\": [\n    \"Classic formal shoes\",\n    \"Toe cap detail\",\n    \"Lightweight but durable sole\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "find. Amazon Brand",
+          "color": "Grey",
+          "product_type": "Shoes",
+          "style": "Brogue leather shoes with laces",
+          "material": "Leather",
+          "model_number": "12 M UK",
+          "key_features": [
+            "Classic formal shoes",
+            "Toe cap detail",
+            "Lightweight but durable sole"
+          ]
+        }
+      },
+      {
+        "item_id": "B0857M4NR7",
+        "raw": "To extract the product attributes step by step:\n\n1. **Identify the brand**: The brand is Amazon Brand - Solimo.\n2. **Identify the color**: The color is not explicitly mentioned, but it can be inferred as UV Printed, which suggests a colorful design.\n3. **Identify the product type**: The product type is a mobile cover or case.\n4. **Identify style**: The style is described as \"Designer Couples Standing in Rain\" which suggests a specific design theme.\n5. **Identify material**: The material is not explicitly mentioned, but it is described as \"Soft Back Case\" which suggests a soft and flexible material.\n6. **Identify model number**: The model number is Vivo V3.\n7. **List 2-4 key features**:\n   - Snug fit for Vivo V3\n   - Compatible with Vivo V3\n   - Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\n   - Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\n\nNow, here is the final JSON object with the extracted product attributes:\n\n```json\n{\n  \"brand\": \"Amazon Brand - Solimo\",\n  \"color\": \"UV Printed\",\n  \"product_type\": \"Mobile Cover/Case\",\n  \"style\": \"Designer Couples Standing in Rain\",\n  \"material\": \"Soft Back Case\",\n  \"model_number\": \"Vivo V3\",\n  \"key_features\": [\n    \"Snug fit for Vivo V3\",\n    \"Compatible with Vivo V3\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}\n```",
+        "pred": {
+          "brand": "Amazon Brand - Solimo",
+          "color": "UV Printed",
+          "product_type": "Mobile Cover/Case",
+          "style": "Designer Couples Standing in Rain",
+          "material": "Soft Back Case",
+          "model_number": "Vivo V3",
+          "key_features": [
+            "Snug fit for Vivo V3",
+            "Compatible with Vivo V3",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "strategy": "structured",
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "metrics": {
+      "brand": 0.16666666666666666,
+      "color": 0.25,
+      "product_type": 0.0,
+      "style": 0.0,
+      "material": 0.08333333333333333,
+      "model_number": 0.0,
+      "overall": 0.08333333333333333
+    },
+    "raw_outputs": [
+      {
+        "item_id": "B089N99KD1",
+        "raw": "{\n  \"brand\": \"Eono\",\n  \"color\": null,\n  \"product_type\": \"傘\",\n  \"style\": \"ダブル レイヤー 反転\",\n  \"material\": \"革\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"自立可能\",\n    \"UV 保護\",\n    \"防風\",\n    \"折りたたみ式\",\n    \"２重生地\",\n    \"耐強風の傘骨\",\n    \"C型手元\"\n  ]\n}",
+        "pred": {
+          "brand": "Eono",
+          "color": null,
+          "product_type": "傘",
+          "style": "ダブル レイヤー 反転",
+          "material": "革",
+          "model_number": null,
+          "key_features": [
+            "自立可能",
+            "UV 保護",
+            "防風",
+            "折りたたみ式",
+            "２重生地",
+            "耐強風の傘骨",
+            "C型手元"
+          ]
+        }
+      },
+      {
+        "item_id": "B081HNH45N",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": null,\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer\",\n  \"material\": \"3D Printed Hard Back Case\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Snug fit for Mobile\",\n    \"Perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Xiaomi Redmi Note 8 Pro\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Stylish design and appearance\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": null,
+          "product_type": "Mobile Cover",
+          "style": "Designer",
+          "material": "3D Printed Hard Back Case",
+          "model_number": null,
+          "key_features": [
+            "Snug fit for Mobile",
+            "Perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Xiaomi Redmi Note 8 Pro",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Stylish design and appearance",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      },
+      {
+        "item_id": "B07FRM1JXK",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"Black\",\n  \"product_type\": \"Laptop Backpack\",\n  \"style\": \"Urban\",\n  \"material\": \"Polyester\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Spacious 29 litre laptop backpack\",\n    \"3 compartments\",\n    \"Padded laptop compartment\",\n    \"Water resistant\",\n    \"Wear-resistant\",\n    \"Durable\",\n    \"Wide & cushioned shoulder strap\",\n    \"Well padded at the back\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "Black",
+          "product_type": "Laptop Backpack",
+          "style": "Urban",
+          "material": "Polyester",
+          "model_number": null,
+          "key_features": [
+            "Spacious 29 litre laptop backpack",
+            "3 compartments",
+            "Padded laptop compartment",
+            "Water resistant",
+            "Wear-resistant",
+            "Durable",
+            "Wide & cushioned shoulder strap",
+            "Well padded at the back"
+          ]
+        }
+      },
+      {
+        "item_id": "B07NZV3BT2",
+        "raw": "{\n  \"brand\": \"Amazon Brand\",\n  \"color\": null,\n  \"product_type\": \"coffee pods\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"French Vanilla Flavored\",\n    \"100% Arabica coffee\",\n    \"Compatible with 1.0 and 2.0 k-cup brewers\",\n    \"Satisfaction Guarantee\"\n  ]\n}",
+        "pred": {
+          "brand": "Amazon Brand",
+          "color": null,
+          "product_type": "coffee pods",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "French Vanilla Flavored",
+            "100% Arabica coffee",
+            "Compatible with 1.0 and 2.0 k-cup brewers",
+            "Satisfaction Guarantee"
+          ]
+        }
+      },
+      {
+        "item_id": "B074MGZ436",
+        "raw": "{\n  \"brand\": \"365 Everyday Value\",\n  \"color\": null,\n  \"product_type\": \"Pinto Beans\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Naturally fat free\",\n    \"Non-BPA lining\",\n    \"Fat Free\",\n    \"Low Sodium\",\n    \"No Salt Added\",\n    \"No Sugar Added\",\n    \"Certified Non-GMO\",\n    \"Certified Vegan\"\n  ]\n}",
+        "pred": {
+          "brand": "365 Everyday Value",
+          "color": null,
+          "product_type": "Pinto Beans",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Naturally fat free",
+            "Non-BPA lining",
+            "Fat Free",
+            "Low Sodium",
+            "No Salt Added",
+            "No Sugar Added",
+            "Certified Non-GMO",
+            "Certified Vegan"
+          ]
+        }
+      },
+      {
+        "item_id": "B08569YM3Y",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": null,\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer Love Couples Pattern UV Printed Soft Back Case\",\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Snug fit for Karbonn K9 Viraat\",\n    \"Perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Karbonn K9 Viraat\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Stylish design and appearance\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": null,
+          "product_type": "Mobile Cover",
+          "style": "Designer Love Couples Pattern UV Printed Soft Back Case",
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Snug fit for Karbonn K9 Viraat",
+            "Perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Karbonn K9 Viraat",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Stylish design and appearance",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      },
+      {
+        "item_id": "B0779D4BTN",
+        "raw": "{\n  \"brand\": \"Basic Care\",\n  \"color\": null,\n  \"product_type\": \"Tablets\",\n  \"style\": null,\n  \"material\": null,\n  \"model_number\": null,\n  \"key_features\": [\n    \"Regular Strength\",\n    \"325mg\",\n    \"500 Count\",\n    \"Caffeine free\",\n    \"Dye free\",\n    \"Gluten free\",\n    \"Pain reliever\",\n    \"Fever reducer\"\n  ]\n}",
+        "pred": {
+          "brand": "Basic Care",
+          "color": null,
+          "product_type": "Tablets",
+          "style": null,
+          "material": null,
+          "model_number": null,
+          "key_features": [
+            "Regular Strength",
+            "325mg",
+            "500 Count",
+            "Caffeine free",
+            "Dye free",
+            "Gluten free",
+            "Pain reliever",
+            "Fever reducer"
+          ]
+        }
+      },
+      {
+        "item_id": "B07FR9Q149",
+        "raw": "{\n  \"brand\": \"Amazon\",\n  \"color\": \"Rosa (Blush Blh)\",\n  \"product_type\": \"Zapatillas\",\n  \"style\": \"mullidas y divertidas con punta abierta\",\n  \"material\": \"piel sintética de lujo\",\n  \"model_number\": null,\n  \"key_features\": [\"mullidas y divertidas con punta abierta\", \"parte superior de piel sintética de lujo con forro polar suave\"]\n}",
+        "pred": {
+          "brand": "Amazon",
+          "color": "Rosa (Blush Blh)",
+          "product_type": "Zapatillas",
+          "style": "mullidas y divertidas con punta abierta",
+          "material": "piel sintética de lujo",
+          "model_number": null,
+          "key_features": [
+            "mullidas y divertidas con punta abierta",
+            "parte superior de piel sintética de lujo con forro polar suave"
+          ]
+        }
+      },
+      {
+        "item_id": "B07QN64SM7",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"Purple and Gray\",\n  \"product_type\": \"Hard Back Case Mobile Cover\",\n  \"style\": \"Designer\",\n  \"material\": \"3D Printed\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.\",\n    \"Stylish design and appearance, express your unique personality.\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface.\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "Purple and Gray",
+          "product_type": "Hard Back Case Mobile Cover",
+          "style": "Designer",
+          "material": "3D Printed",
+          "model_number": null,
+          "key_features": [
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports.",
+            "Stylish design and appearance, express your unique personality.",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface."
+          ]
+        }
+      },
+      {
+        "item_id": "B079PY4GLR",
+        "raw": "{\n  \"brand\": \"Starter\",\n  \"color\": \"White\",\n  \"product_type\": \"Men's Fitted Cap\",\n  \"style\": \"Performance Hat\",\n  \"material\": \"Active-inspired mesh fabric\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Wicking sweatband\",\n    \"Curved visor\",\n    \"DRI-STAR technology\",\n    \"Rubberized logo on front\",\n    \"Breathability\"\n  ]\n}",
+        "pred": {
+          "brand": "Starter",
+          "color": "White",
+          "product_type": "Men's Fitted Cap",
+          "style": "Performance Hat",
+          "material": "Active-inspired mesh fabric",
+          "model_number": null,
+          "key_features": [
+            "Wicking sweatband",
+            "Curved visor",
+            "DRI-STAR technology",
+            "Rubberized logo on front",
+            "Breathability"
+          ]
+        }
+      },
+      {
+        "item_id": "B01MS62TLU",
+        "raw": "{\n  \"brand\": \"Amazon Brand Brogue de Piel\",\n  \"color\": \"Gris\",\n  \"product_type\": \"Zapatos\",\n  \"style\": \"clásicos formales\",\n  \"material\": \"Piel\",\n  \"model_number\": null,\n  \"key_features\": [\"Detalle de corte de los dedos\", \"Suela ligera pero duradera\"]\n}",
+        "pred": {
+          "brand": "Amazon Brand Brogue de Piel",
+          "color": "Gris",
+          "product_type": "Zapatos",
+          "style": "clásicos formales",
+          "material": "Piel",
+          "model_number": null,
+          "key_features": [
+            "Detalle de corte de los dedos",
+            "Suela ligera pero duradera"
+          ]
+        }
+      },
+      {
+        "item_id": "B0857M4NR7",
+        "raw": "{\n  \"brand\": \"Solimo\",\n  \"color\": \"UV Printed\",\n  \"product_type\": \"Mobile Cover\",\n  \"style\": \"Designer\",\n  \"material\": \"Soft Back Case\",\n  \"model_number\": null,\n  \"key_features\": [\n    \"Snug fit for Vivo V3\",\n    \"Perfect cut-outs for volume buttons, audio and charging ports\",\n    \"Compatible with Vivo V3\",\n    \"Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports\",\n    \"Stylish design and appearance\",\n    \"Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface\"\n  ]\n}",
+        "pred": {
+          "brand": "Solimo",
+          "color": "UV Printed",
+          "product_type": "Mobile Cover",
+          "style": "Designer",
+          "material": "Soft Back Case",
+          "model_number": null,
+          "key_features": [
+            "Snug fit for Vivo V3",
+            "Perfect cut-outs for volume buttons, audio and charging ports",
+            "Compatible with Vivo V3",
+            "Easy to put & take off with perfect cutouts for volume buttons, audio & charging ports",
+            "Stylish design and appearance",
+            "Extreme precision design allows easy access to all buttons and ports while featuring raised bezel to life screen and camera off flat surface"
+          ]
+        }
+      }
+    ]
+  }
+]

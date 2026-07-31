@@ -1,0 +1,13 @@
+pandas
+numpy
+openai
+python-dotenv
+streamlit
+plotly
+scikit-learn
+tqdm
+tenacity
+mlflow
+fastapi
+uvicorn
+pydantic
