@@ -134,6 +134,22 @@ if result_files and selected_file != "No results found":
                 st.write("### Prediction")
                 st.json(item.get("pred", {}))
 
+                # Add LLM Judge display
+                judge = item.get("judge")
+                if judge:
+                    st.write("### 🤖 LLM Judge")
+
+                    st.metric("Judge Score", f"{judge['score']}/5")
+
+                    st.write("**Reason**")
+                    st.write(judge["reason"])
+
+                    st.write("**Correct Attributes**")
+                    st.write(judge["correct_attributes"])
+
+                    st.write("**Incorrect Attributes**")
+                    st.write(judge["incorrect_attributes"])
+
                 st.write("### Raw LLM Output")
                 st.code(
                     item.get("raw", ""),
@@ -197,6 +213,22 @@ if st.button("Extract Attributes"):
 
             st.subheader("Extracted Attributes")
             st.json(result.get("prediction", {}))
+
+            # Show judge evaluation if available
+            judge = result.get("judge")
+            if judge:
+                st.write("### 🤖 LLM Judge")
+
+                st.metric("Judge Score", f"{judge['score']}/5")
+
+                st.write("**Reason**")
+                st.write(judge["reason"])
+
+                st.write("**Correct Attributes**")
+                st.write(judge["correct_attributes"])
+
+                st.write("**Incorrect Attributes**")
+                st.write(judge["incorrect_attributes"])
 
             with st.expander("Raw LLM Output"):
                 st.code(
