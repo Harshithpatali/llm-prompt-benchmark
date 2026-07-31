@@ -5,6 +5,12 @@ import plotly.express as px
 from pathlib import Path
 import requests
 
+# ==============================
+# Configuration
+# ==============================
+
+BACKEND_URL = "https://llm-prompt-benchmark.onrender.com"
+
 st.set_page_config(page_title="LLM Prompt Benchmark", layout="wide")
 st.title("LLM Prompt Evaluation Dashboard")
 
@@ -25,10 +31,10 @@ if result_files and selected_file != "No results found":
     with open(results_dir / selected_file, encoding="utf-8") as f:
         data = json.load(f)
 
-    # ---------- Strategy Comparison ----------
     st.subheader("Strategy Comparison")
 
     metrics_data = []
+
     for item in data:
         row = {"strategy": item["strategy"]}
         row.update(item.get("metrics", {}))
@@ -36,7 +42,7 @@ if result_files and selected_file != "No results found":
 
     metrics_df = pd.DataFrame(metrics_data)
 
-    # Convert all metric columns to numeric
+    # Convert numeric columns
     for col in metrics_df.columns:
         if col != "strategy":
             metrics_df[col] = pd.to_numeric(metrics_df[col], errors="coerce")
@@ -53,6 +59,7 @@ if result_files and selected_file != "No results found":
 
     # ---------- Overall Performance ----------
     if "overall" in metrics_df.columns:
+
         fig = px.bar(
             metrics_df,
             x="strategy",
@@ -80,6 +87,7 @@ if result_files and selected_file != "No results found":
     ]
 
     if attr_cols:
+
         melted = metrics_df.melt(
             id_vars="strategy",
             value_vars=attr_cols,
@@ -116,10 +124,13 @@ if result_files and selected_file != "No results found":
     raw_outputs = selected.get("raw_outputs", [])
 
     if raw_outputs:
+
         for i, item in enumerate(raw_outputs[:10]):
+
             with st.expander(
                 f"Sample {i+1} | {item.get('item_id','Unknown')}"
             ):
+
                 st.write("### Prediction")
                 st.json(item.get("pred", {}))
 
@@ -128,15 +139,16 @@ if result_files and selected_file != "No results found":
                     item.get("raw", ""),
                     language="json"
                 )
+
     else:
         st.info("No raw outputs available.")
 
 else:
     st.warning("No experiment results found. Run the experiment first.")
 
-# ======================================================================
-# Live Extraction
-# ======================================================================
+# ==========================================================
+# Live Attribute Extraction
+# ==========================================================
 
 st.divider()
 st.subheader("Live Attribute Extraction")
@@ -153,8 +165,8 @@ with col2:
             "structured",
             "zero_shot",
             "cot",
-            "few_shot"
-        ]
+            "few_shot",
+        ],
     )
 
 bullet_points = st.text_area(
@@ -168,38 +180,47 @@ if st.button("Extract Attributes"):
         try:
 
             response = requests.post(
-                "http://localhost:8000/extract",
+                f"{BACKEND_URL}/extract",
                 json={
                     "item_name": item_name,
                     "bullet_points": bullet_points,
                     "strategy": strategy,
                 },
-                timeout=30,
+                timeout=60,
             )
 
-            if response.status_code == 200:
+            response.raise_for_status()
 
-                result = response.json()
+            result = response.json()
 
-                st.success("Extraction successful")
+            st.success("Extraction successful!")
 
-                st.subheader("Extracted Attributes")
-                st.json(result.get("prediction", {}))
+            st.subheader("Extracted Attributes")
+            st.json(result.get("prediction", {}))
 
-                with st.expander("Raw LLM Output"):
-                    st.code(
-                        result.get("raw_output", ""),
-                        language="json"
-                    )
+            with st.expander("Raw LLM Output"):
+                st.code(
+                    result.get("raw_output", ""),
+                    language="json"
+                )
 
-            else:
-                st.error(f"Backend Error:\n{response.text}")
+        except requests.exceptions.RequestException as e:
 
-        except Exception as e:
             st.error(
-                "Could not connect to FastAPI backend.\n\n"
-                "Make sure it is running on http://localhost:8000\n\n"
-                f"Error:\n{e}"
+                f"""
+Could not connect to the FastAPI backend.
+
+Backend URL:
+{BACKEND_URL}
+
+Please ensure:
+• The Render service is running.
+• The /extract endpoint exists.
+• The backend deployment completed successfully.
+
+Error:
+{e}
+"""
             )
 
     else:
