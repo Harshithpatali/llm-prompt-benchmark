@@ -1,253 +1,140 @@
-import streamlit as st
-import pandas as pd
+"""Prompt Benchmark — experiment comparison and live extraction."""
 import json
-import plotly.express as px
 from pathlib import Path
+
+import pandas as pd
+import plotly.express as px
 import requests
-
-# ==============================
-# Configuration
-# ==============================
-
-BACKEND_URL = "https://llm-prompt-benchmark.onrender.com"
+import streamlit as st
 
 st.set_page_config(page_title="Prompt Benchmark", page_icon="📊", layout="wide")
-st.title("Prompt Benchmark")
-st.caption("Legacy structured extraction benchmark — preserved as one evaluation workspace within the platform.")
+API_URL = "https://llm-prompt-benchmark.onrender.com"
 
-# ---------- Sidebar ----------
-st.sidebar.header("Settings")
+st.title("📊 Prompt Benchmark")
+st.caption("Compare structured extraction strategies, inspect experiment artifacts and run a live product-attribute extraction.")
 
 results_dir = Path("results")
 result_files = sorted(results_dir.glob("*.json"), reverse=True) if results_dir.exists() else []
 
-selected_file = st.sidebar.selectbox(
-    "Select Experiment Result",
-    options=[f.name for f in result_files] if result_files else ["No results found"]
-)
+tab_results, tab_live = st.tabs(["① Experiment results", "② Live extraction"])
 
-# ---------- Load Data ----------
-if result_files and selected_file != "No results found":
-
-    with open(results_dir / selected_file, encoding="utf-8") as f:
-        data = json.load(f)
-
-    # New benchmark artifacts are metadata/results objects; retain legacy list support.
-    if isinstance(data, dict):
-        metadata = data.get('metadata', {})
-        if metadata:
-            st.caption(f"Model: {metadata.get('model', 'unknown')} | Provider: {metadata.get('provider', 'unknown')} | Test rows: {len(metadata.get('test_ids', []))}")
-        comparisons = data.get('paired_comparisons_vs_zero_shot', {})
-        if comparisons:
-            with st.expander('Paired comparisons vs zero-shot'):
-                st.json(comparisons)
-        data = data.get('results', [])
-
-    st.subheader("Strategy Comparison")
-
-    metrics_data = []
-
-    for item in data:
-        row = {"strategy": item["strategy"]}
-        metric_values = item.get("metrics", {})
-        row.update({k: v for k, v in metric_values.items() if k != "per_attribute" and isinstance(v, (int, float))})
-        for attribute, values in metric_values.get("per_attribute", {}).items():
-            row[attribute] = values.get("exact_match", 0.0)
-        metrics_data.append(row)
-
-    metrics_df = pd.DataFrame(metrics_data)
-
-    # Convert numeric columns
-    for col in metrics_df.columns:
-        if col != "strategy":
-            metrics_df[col] = pd.to_numeric(metrics_df[col], errors="coerce")
-
-    numeric_cols = [c for c in metrics_df.columns if c != "strategy"]
-
-    st.dataframe(
-        metrics_df.style.format(
-            "{:.3f}",
-            subset=numeric_cols
-        ),
-        use_container_width=True
-    )
-
-    # ---------- Overall Performance ----------
-    if "overall" in metrics_df.columns:
-
-        fig = px.bar(
-            metrics_df,
-            x="strategy",
-            y="overall",
-            color="strategy",
-            title="Overall Exact Match by Strategy",
-            text="overall",
-        )
-
-        fig.update_traces(
-            texttemplate="%{text:.3f}",
-            textposition="outside"
-        )
-
-        fig.update_layout(yaxis_range=[0, 1])
-
-        st.plotly_chart(fig, use_container_width=True)
-
-    # ---------- Attribute Performance ----------
-    st.subheader("Attribute-level Performance")
-
-    attr_cols = [
-        c for c in metrics_df.columns
-        if c not in ["strategy", "overall"]
-    ]
-
-    if attr_cols:
-
-        melted = metrics_df.melt(
-            id_vars="strategy",
-            value_vars=attr_cols,
-            var_name="attribute",
-            value_name="score"
-        )
-
-        fig2 = px.bar(
-            melted,
-            x="attribute",
-            y="score",
-            color="strategy",
-            barmode="group",
-            title="Attribute-wise Exact Match"
-        )
-
-        fig2.update_layout(yaxis_range=[0, 1])
-
-        st.plotly_chart(fig2, use_container_width=True)
-
-    # ---------- Raw Outputs ----------
-    st.subheader("Raw Outputs Explorer")
-
-    strategy_filter = st.selectbox(
-        "Filter by strategy",
-        options=[d["strategy"] for d in data]
-    )
-
-    selected = next(
-        d for d in data
-        if d["strategy"] == strategy_filter
-    )
-
-    raw_outputs = selected.get("raw_outputs") or selected.get("rows", [])
-
-    if raw_outputs:
-        for i, item in enumerate(raw_outputs[:20]):
-            with st.expander(f"Sample {i+1} | {item.get('item_id', 'Unknown')}"):
-                st.write("### Prediction")
-                st.json(item.get("prediction", item.get("pred", {})))
-                st.write("### Ground truth")
-                st.json(item.get("gold", {}))
-                st.caption(f"Latency: {item.get('latency_ms', 'n/a')} ms")
-                if item.get("error"): st.warning(item["error"])
-                st.write("### Raw LLM Output")
-                st.code(item.get("raw", ""), language="json")
+with tab_results:
+    st.subheader("Select an experiment")
+    if not result_files:
+        st.info("No experiment result files were found in the repository's results/ directory. Run a benchmark and add its JSON artifact to explore results here.")
     else:
-        st.info("No raw outputs available.")
-
-else:
-    st.warning("No experiment results found. Run the experiment first.")
-
-# ==========================================================
-# Live Attribute Extraction
-# ==========================================================
-
-st.divider()
-st.subheader("Live Attribute Extraction")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    item_name = st.text_input("Product Title")
-
-with col2:
-    strategy = st.selectbox(
-        "Strategy",
-        [
-            "structured",
-            "zero_shot",
-            "cot",
-            "role_based",
-        ],
-    )
-
-bullet_points = st.text_area(
-    "Bullet Points (separated by | or new lines)"
-)
-
-if st.button("Extract Attributes"):
-
-    if item_name and bullet_points:
-
+        selected_file = st.selectbox("Experiment result", result_files, format_func=lambda p: p.name)
         try:
+            with selected_file.open(encoding="utf-8") as handle:
+                artifact = json.load(handle)
+            metadata = artifact.get("metadata", {}) if isinstance(artifact, dict) else {}
+            rows = artifact.get("results", []) if isinstance(artifact, dict) else artifact
+            if metadata:
+                st.caption(
+                    f"Provider: {metadata.get('provider', '—')} · Model: {metadata.get('model', '—')} · "
+                    f"Test examples: {len(metadata.get('test_ids', []))}"
+                )
+            if not rows:
+                st.warning("The selected artifact does not contain strategy results.")
+            else:
+                metrics_data = []
+                for item in rows:
+                    metrics = item.get("metrics", {})
+                    row = {"Strategy": item.get("strategy", "unknown")}
+                    row.update({k: v for k, v in metrics.items() if k != "per_attribute" and isinstance(v, (int, float))})
+                    for attribute, values in metrics.get("per_attribute", {}).items():
+                        row[attribute] = values.get("exact_match", 0.0)
+                    metrics_data.append(row)
+                metrics_df = pd.DataFrame(metrics_data)
+                for column in metrics_df.columns:
+                    if column != "Strategy":
+                        metrics_df[column] = pd.to_numeric(metrics_df[column], errors="coerce")
+                st.subheader("Strategy comparison")
+                metric_cols = [c for c in metrics_df.columns if c != "Strategy"]
+                if metric_cols:
+                    first_metric = "overall" if "overall" in metric_cols else metric_cols[0]
+                    best = metrics_df.sort_values(first_metric, ascending=False).iloc[0]
+                    c1, c2, c3 = st.columns(3)
+                    c1.metric("Strategies compared", len(metrics_df))
+                    c2.metric(f"Best {first_metric}", best["Strategy"])
+                    c3.metric("Score", f"{best[first_metric]:.3f}" if pd.notna(best[first_metric]) else "—")
+                st.dataframe(metrics_df, use_container_width=True, hide_index=True)
+                if "overall" in metrics_df.columns:
+                    fig = px.bar(metrics_df, x="Strategy", y="overall", color="Strategy", text="overall", title="Overall exact match by strategy")
+                    fig.update_traces(texttemplate="%{text:.3f}", textposition="outside")
+                    fig.update_layout(yaxis_range=[0, 1], showlegend=False)
+                    st.plotly_chart(fig, use_container_width=True)
+                attribute_cols = [c for c in metric_cols if c != "overall"]
+                if attribute_cols:
+                    melted = metrics_df.melt(id_vars="Strategy", value_vars=attribute_cols, var_name="Attribute", value_name="Exact match")
+                    fig2 = px.bar(melted, x="Attribute", y="Exact match", color="Strategy", barmode="group", title="Attribute-level exact match")
+                    fig2.update_layout(yaxis_range=[0, 1])
+                    st.plotly_chart(fig2, use_container_width=True)
+                comparisons = artifact.get("paired_comparisons_vs_zero_shot", {}) if isinstance(artifact, dict) else {}
+                if comparisons:
+                    with st.expander("Paired comparisons against zero-shot"):
+                        st.json(comparisons)
+                st.subheader("Inspect individual outputs")
+                strategy_names = [item.get("strategy", "unknown") for item in rows]
+                selected_strategy = st.selectbox("Strategy", strategy_names)
+                selected = next(item for item in rows if item.get("strategy", "unknown") == selected_strategy)
+                raw_outputs = selected.get("raw_outputs") or selected.get("rows", [])
+                if raw_outputs:
+                    for index, item in enumerate(raw_outputs[:50]):
+                        with st.expander(f"Example {index + 1} · {item.get('item_id', 'unknown item')}"):
+                            left, right = st.columns(2)
+                            with left:
+                                st.markdown("**Prediction**")
+                                st.json(item.get("prediction", item.get("pred", {})))
+                            with right:
+                                st.markdown("**Reference**")
+                                st.json(item.get("gold", {}))
+                            st.caption(f"Latency: {item.get('latency_ms', '—')} ms")
+                            if item.get("error"):
+                                st.warning(item["error"])
+                            with st.expander("Raw model output"):
+                                st.code(item.get("raw", ""), language="json")
+                else:
+                    st.info("This strategy artifact does not include raw outputs.")
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            st.error(f"Could not read this experiment artifact: {exc}")
 
-            response = requests.post(
-                f"{BACKEND_URL}/extract",
-                json={
-                    "item_name": item_name,
-                    "bullet_points": bullet_points,
+with tab_live:
+    st.subheader("Run a live product extraction")
+    st.write("Send a product title and its bullet points to the evaluation API. The result is a single live model response, not a benchmark score.")
+    with st.form("live_extraction"):
+        title = st.text_input("Product title", placeholder="e.g. Wireless noise-cancelling headphones")
+        bullets = st.text_area("Product bullet points", height=150, placeholder="Paste product features. Separate points with new lines or |.")
+        strategy = st.selectbox("Prompt strategy", ["structured", "zero_shot", "cot", "role_based"])
+        run = st.form_submit_button("Extract attributes", type="primary", use_container_width=True, disabled=not title.strip() or not bullets.strip())
+    if run:
+        try:
+            with st.spinner("Calling the extraction API…"):
+                response = requests.post(f"{API_URL}/extract", json={
+                    "item_name": title,
+                    "bullet_points": bullets,
                     "strategy": strategy,
                     "provider": "groq",
-                },
-                timeout=60,
-            )
-
-            response.raise_for_status()
-
-            result = response.json()
-
-            st.success("Extraction successful!")
-
-            st.subheader("Extracted Attributes")
+                }, timeout=90)
+                response.raise_for_status()
+                result = response.json()
+            st.success("Extraction completed.")
+            st.subheader("Extracted attributes")
             st.json(result.get("prediction", {}))
-
-            # Show judge evaluation if available
             judge = result.get("judge")
             if judge:
-                st.write("### 🤖 LLM Judge")
-
-                st.metric("Judge Score", f"{judge['score']}/5")
-
-                st.write("**Reason**")
-                st.write(judge["reason"])
-
-                st.write("**Correct Attributes**")
-                st.write(judge["correct_attributes"])
-
-                st.write("**Incorrect Attributes**")
-                st.write(judge["incorrect_attributes"])
-
-            with st.expander("Raw LLM Output"):
-                st.code(
-                    result.get("raw_output", ""),
-                    language="json"
-                )
-
-        except requests.exceptions.RequestException as e:
-
-            st.error(
-                f"""
-Could not connect to the FastAPI backend.
-
-Backend URL:
-{BACKEND_URL}
-
-Please ensure:
-• The Render service is running.
-• The /extract endpoint exists.
-• The backend deployment completed successfully.
-
-Error:
-{e}
-"""
-            )
-
-    else:
-        st.warning("Please enter both the product title and bullet points.")
+                cols = st.columns(3)
+                cols[0].metric("Judge score", f"{judge.get('score', '—')}/5")
+                cols[1].metric("Correct attributes", len(judge.get("correct_attributes", [])))
+                cols[2].metric("Incorrect attributes", len(judge.get("incorrect_attributes", [])))
+                st.markdown("**Judge rationale**")
+                st.write(judge.get("reason", ""))
+                with st.expander("Correct and incorrect attribute details"):
+                    st.write("Correct")
+                    st.write(judge.get("correct_attributes", []))
+                    st.write("Incorrect")
+                    st.write(judge.get("incorrect_attributes", []))
+            with st.expander("Raw model output"):
+                st.code(result.get("raw_output", ""), language="json")
+        except requests.RequestException as exc:
+            st.error(f"Extraction request failed: {exc}")
