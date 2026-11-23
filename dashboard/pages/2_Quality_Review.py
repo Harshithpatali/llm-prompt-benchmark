@@ -16,7 +16,7 @@ def setting(name: str, default: str = "") -> str:
         return os.getenv(name, default).strip()
 
 API_BASE_URL = setting("API_BASE_URL", "https://llm-prompt-benchmark.onrender.com").rstrip("/")
-API_KEY = setting("REVIEW_API_KEY")
+API_KEY = setting("REVIEW_API_KEY") or st.session_state.get("review_api_key", "")
 TIMEOUT = 30
 
 if not API_KEY:
