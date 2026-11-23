@@ -65,9 +65,17 @@ with st.sidebar:
     provider = st.selectbox("Model provider", ["groq", "openrouter"], help="Choose the configured provider on the API service.")
     model = st.text_input("Model ID", value=DEFAULT_MODEL)
     st.divider()
-    st.caption("The framework and QA specification are built into the backend. You do not need to upload a rubric template.")
+    st.caption("Rubric generation uses the model provider configured on the API. The framework and QA rules are built in.")
     if not secret("REVIEW_API_KEY"):
-        entered = st.text_input("Review API key", type="password", value=st.session_state.get("rubric_review_key", ""), help="Required for saving, approving and evaluating. Stored only in this session.")
+        st.markdown("**Reviewer access**")
+        st.caption("This key protects write actions across the platform. It is not needed to generate a rubric.")
+        entered = st.text_input(
+            "Review API key",
+            type="password",
+            value=st.session_state.get("rubric_review_key", ""),
+            help="Ask the platform administrator for access. Never use your model-provider API key here.",
+            key="rubric_review_api_key_input",
+        )
         if entered:
             st.session_state["rubric_review_key"] = entered
 
@@ -98,7 +106,7 @@ with tab_build:
         with right:
             st.caption("Also include")
             st.markdown("- Edge cases and conflict handling\n- Required output structure\n- Actions and verification, if relevant")
-        generate = st.form_submit_button("Generate rubric", type="primary", use_container_width=True, disabled=len(scenario.strip()) < 30)
+        generate = st.form_submit_button("Generate rubric", type="primary", use_container_width=True, disabled=len(scenario.strip()) < 10)
     if generate:
         st.session_state["rubric_scenario"] = scenario
         st.session_state.pop("rubric_csv", None)
