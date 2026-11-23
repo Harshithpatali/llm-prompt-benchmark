@@ -95,11 +95,17 @@ def get_calibration_records(rubric_id: UUID | None=None) -> list[dict]:
                LEFT JOIN public.rubric_adjudications a
                  ON a.rubric_evaluation_id=s.rubric_evaluation_id AND a.component_id=s.component_id
                LEFT JOIN LATERAL (
-                 SELECT (array_agg(verdict ORDER BY cnt DESC,verdict))[1] AS majority_verdict,
-                        count(*) AS annotator_count
+                 SELECT CASE WHEN count(*) FILTER (WHERE cnt=top.top_count)=1
+                                  THEN (array_agg(verdict ORDER BY cnt DESC,verdict))[1]
+                                  ELSE NULL END AS majority_verdict,
+                        COALESCE(sum(cnt),0) AS annotator_count
                  FROM (SELECT verdict,count(*) AS cnt FROM public.rubric_human_annotations h
                        WHERE h.rubric_evaluation_id=s.rubric_evaluation_id AND h.component_id=s.component_id
                        GROUP BY verdict) votes
+                 CROSS JOIN (SELECT COALESCE(max(cnt),0) AS top_count FROM
+                       (SELECT count(*) AS cnt FROM public.rubric_human_annotations h
+                        WHERE h.rubric_evaluation_id=s.rubric_evaluation_id AND h.component_id=s.component_id
+                        GROUP BY verdict) ranked) top
                ) hm ON TRUE
                WHERE COALESCE(a.final_verdict,hm.majority_verdict) IS NOT NULL
                  AND (%s::uuid IS NULL OR e.rubric_id=%s::uuid)
