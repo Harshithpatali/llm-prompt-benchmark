@@ -1,5 +1,7 @@
 """LLM Quality Intelligence Platform — Streamlit multipage entrypoint."""
 import os
+import sys
+from pathlib import Path
 
 import requests
 import streamlit as st
@@ -34,14 +36,21 @@ div[data-testid="stTabs"] button { font-weight: 600; }
 </style>
 """, unsafe_allow_html=True)
 
+DASHBOARD_DIR = Path(__file__).resolve().parent
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.insert(0, str(DASHBOARD_DIR))
+from ui import apply_theme, page_header
+
+apply_theme()
+
 API_BASE_URL = os.getenv(
     "API_BASE_URL", "https://llm-prompt-benchmark.onrender.com"
 ).rstrip("/")
 
 
 def render_home() -> None:
-    st.title("LLM Quality Intelligence")
-    st.caption("One workspace to benchmark prompts, inspect response quality, build evaluation rubrics and calibrate LLM judges.")
+    page_header("Evaluation operations", "LLM Quality Intelligence", "A unified workspace to build evaluation rubrics, review model responses, benchmark prompt strategies and measure judge reliability.")
+    st.markdown("**Start with a workflow** · Your evaluation data and experiment history stay in the connected workspace.")
 
     try:
         response = requests.get(f"{API_BASE_URL}/database/health", timeout=8)
@@ -53,8 +62,8 @@ def render_home() -> None:
     except requests.RequestException:
         st.warning("API is temporarily unavailable. Existing local benchmark reports may still be explored.")
 
-    st.subheader("Your workspaces")
-    st.write("Choose a task to get started.")
+    st.subheader("Workspaces")
+    st.caption("Choose a task to get started. Each workspace is focused on one stage of evaluation.")
     cards = [
         ("🧩", "Rubric Studio", "Create a rubric from a scenario, run quality checks, save versions and evaluate responses.", rubric_page, "Start building"),
         ("🧪", "Human Quality Review", "Review candidate answers, record evidence and submit structured human assessments.", review_page, "Review answers"),
@@ -71,7 +80,7 @@ def render_home() -> None:
                     st.write(desc)
                     st.page_link(page, label=action, use_container_width=True)
 
-    st.subheader("Suggested workflow")
+    st.subheader("Recommended workflow")
     st.markdown("**1. Build a rubric** → **2. Approve a version** → **3. Evaluate a response** → **4. Collect expert labels** → **5. Measure judge agreement**")
     with st.expander("About the data and metrics"):
         st.write("Starter seller-support scenarios are authored examples, not real customer records or validated gold labels. Human agreement and judge reliability should only be interpreted after collecting sufficient independent expert annotations. Lexical overlap diagnostics are not semantic factuality checks.")
