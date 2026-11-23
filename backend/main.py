@@ -70,7 +70,7 @@ class QualityResultCreate(BaseModel):
 
 class RubricGenerateRequest(BaseModel):
     scenario: str = Field(min_length=30, max_length=30000)
-    provider: str = Field(default="groq", pattern="^(groq|openrouter)$")
+    provider: str = Field(default="groq", pattern="^(groq|openrouter|gemini)$")
     model: str | None = Field(default=None, max_length=200)
 
 
@@ -157,6 +157,7 @@ def _client(provider: str):
     configs = {
         "groq": ("GROQ_API_KEY", "https://api.groq.com/openai/v1"),
         "openrouter": ("OPENROUTER_API_KEY", "https://openrouter.ai/api/v1"),
+        "gemini": ("GEMINI_API_KEY", "https://generativelanguage.googleapis.com/v1beta/openai/"),
     }
     if provider not in configs:
         raise HTTPException(400, "Unsupported provider")
@@ -170,7 +171,7 @@ def _client(provider: str):
 def generate_rubric(req: RubricGenerateRequest):
     """Generate a rubric from the checked-in framework and return deterministic QA."""
     prompt = build_generation_prompt(req.scenario)
-    model = req.model or os.getenv("MODEL_NAME", "openai/gpt-oss-20b")
+    model = req.model or (os.getenv("GEMINI_MODEL", "gemini-2.5-flash") if req.provider == "gemini" else os.getenv("MODEL_NAME", "openai/gpt-oss-20b"))
     try:
         response = _client(req.provider).chat.completions.create(
             model=model,
