@@ -24,7 +24,7 @@ def make_csv():
 
 def test_valid_csv_passes():
     result=validate_csv(make_csv())
-    assert result["status"]=="PASS"
+    assert result["status"]=="PASS", result["issues"]
     assert result["counts"]["atomic_components"]==50
     assert result["counts"]["overall_components"]==14
 
