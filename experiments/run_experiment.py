@@ -1,282 +1,94 @@
-import os
-import json
-import time
-from datetime import datetime
-from tqdm import tqdm
+"""Leakage-safe prompt benchmark. Run: python -m experiments.run_experiment"""
+import json, os, random, time
+from datetime import datetime, timezone
+from pathlib import Path
+import mlflow
 from dotenv import load_dotenv
 from openai import OpenAI
-import mlflow
-
-from utils.data_loader import load_data, prepare_examples
-from prompts.prompt_templates import (
-    zero_shot_prompt,
-    few_shot_prompt,
-    cot_prompt,
-    structured_prompt,
-)
-from evaluation.metrics import safe_parse_json, evaluate_batch
-from evaluation.llm_judge import llm_as_judge
-
+from tqdm import tqdm
+from evaluation.metrics import evaluate_batch, paired_bootstrap_ci, paired_sign_test, safe_parse_json
+from prompts.prompt_templates import PROMPT_MAP
+from utils.data_loader import load_data, split_data, prepare_examples, gold_record
 load_dotenv()
+PROVIDERS={"groq":("GROQ_API_KEY","https://api.groq.com/openai/v1"),
+           "openrouter":("OPENROUTER_API_KEY","https://openrouter.ai/api/v1")}
+DEFAULT_MODELS={"groq":"llama-3.1-8b-instant","openrouter":"meta-llama/llama-3.1-8b-instruct"}
 
-# =====================================================
-# CONFIG
-# =====================================================
+def make_client(provider):
+    if provider not in PROVIDERS: raise ValueError("Unsupported provider: "+provider)
+    key_name,base=PROVIDERS[provider]; key=os.getenv(key_name)
+    if not key: raise RuntimeError(key_name+" is required")
+    return OpenAI(api_key=key,base_url=base,timeout=float(os.getenv("TIMEOUT_SECONDS","45")))
 
-PROVIDER = "groq"          # "groq" or "openrouter"
-
-GROQ_MODEL = "llama-3.1-8b-instant"
-OPENROUTER_MODEL = "meta-llama/llama-3.1-8b-instruct"
-
-N_SAMPLES = 12
-TEMPERATURE = 0.0
-
-
-# =====================================================
-# CLIENT
-# =====================================================
-
-def get_client(provider: str) -> OpenAI:
-    if provider == "groq":
-        return OpenAI(
-            api_key=os.getenv("GROQ_API_KEY"),
-            base_url="https://api.groq.com/openai/v1",
-        )
-
-    elif provider == "openrouter":
-        return OpenAI(
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",
-        )
-
-    raise ValueError("Provider must be groq or openrouter")
-
-
-def get_model_name(provider: str):
-    if provider == "groq":
-        return GROQ_MODEL
-    return OPENROUTER_MODEL
-
-
-client = get_client(PROVIDER)
-MODEL = get_model_name(PROVIDER)
-
-
-# =====================================================
-# LLM CALL
-# =====================================================
-
-def call_llm(prompt: str, max_retries: int = 3):
-
-    for attempt in range(max_retries):
-
+def call_model(client,model,prompt):
+    error=None
+    for attempt in range(int(os.getenv("RETRY_LIMIT","3"))):
         try:
+            start=time.perf_counter()
+            response=client.chat.completions.create(model=model,messages=[{"role":"user","content":prompt}],
+                temperature=float(os.getenv("TEMPERATURE","0")),max_tokens=int(os.getenv("MAX_TOKENS","512")))
+            ms=(time.perf_counter()-start)*1000; choice=response.choices[0]; usage=response.usage
+            return choice.message.content or "",ms,getattr(usage,"prompt_tokens",None),getattr(usage,"completion_tokens",None),None
+        except Exception as exc:
+            error=type(exc).__name__+": "+str(exc)
+            if attempt+1<int(os.getenv("RETRY_LIMIT","3")): time.sleep(min(2**attempt+random.random(),10))
+    return "",0,None,None,error
 
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=TEMPERATURE,
-                max_tokens=1024,
-            )
-
-            return response.choices[0].message.content
-
-        except Exception as e:
-
-            print(f"Attempt {attempt + 1} failed: {e}")
-            time.sleep(2 ** attempt)
-
-    return ""
-
-
-# =====================================================
-# RUN ONE PROMPT STRATEGY
-# =====================================================
-
-def run_strategy(name, prompt_fn, test_df, examples=None):
-
-    print(f"\nRunning {name} using {MODEL}")
-
-    predictions = []
-    golds = []
-    raw_outputs = []
-
-    for _, row in tqdm(test_df.iterrows(), total=len(test_df)):
-
-        if name == "few_shot":
-            prompt = prompt_fn(
-                row["item_name"],
-                row["bullet_points_text"],
-                examples,
-            )
-        else:
-            prompt = prompt_fn(
-                row["item_name"],
-                row["bullet_points_text"],
-            )
-
-        raw = call_llm(prompt)
-
-        pred = safe_parse_json(raw)
-
-        gold = {
-            "brand": row.get("brand"),
-            "color": row.get("color"),
-            "product_type": row.get("product_type"),
-            "style": row.get("style"),
-            "material": row.get("material"),
-            "model_number": row.get("model_number"),
-            "key_features": (
-                row.get("bullet_points", [])[:4]
-                if isinstance(row.get("bullet_points"), list)
-                else []
-            ),
-        }
-
-        # =====================================================
-        # LLM AS JUDGE
-        # =====================================================
-
-        judge = llm_as_judge(
-            prediction=pred,
-            gold=gold,
-            item_name=row["item_name"],
-            bullet_points=row["bullet_points_text"],
-        )
-
-        predictions.append(pred)
-        golds.append(gold)
-
-        raw_outputs.append(
-            {
-                "item_id": row["item_id"],
-                "raw": raw,
-                "pred": pred,
-                "gold": gold,
-                "judge": judge,
-            }
-        )
-
-        time.sleep(0.35)
-
-    metrics = evaluate_batch(predictions, golds)
-
-    # =====================================================
-    # Average Judge Score
-    # =====================================================
-
-    judge_scores = [
-        item["judge"]["score"]
-        for item in raw_outputs
-        if item.get("judge") and "score" in item["judge"]
-    ]
-
-    if judge_scores:
-        metrics["judge_avg_score"] = round(
-            sum(judge_scores) / len(judge_scores),
-            3,
-        )
-
-    return {
-        "strategy": name,
-        "provider": PROVIDER,
-        "model": MODEL,
-        "metrics": metrics,
-        "raw_outputs": raw_outputs,
-    }
-
-
-# =====================================================
-# MAIN
-# =====================================================
+def run_strategy(name,fn,test,demos,client,model):
+    predictions=[]; golds=[]; raws=[]; rows=[]; latencies=[]
+    for _,r in tqdm(test.iterrows(),total=len(test),desc=name):
+        title=str(r.get("item_name","")); bullets=str(r.get("bullet_points_text",""))
+        prompt=fn(title,bullets,demos) if name=="few_shot" else fn(title,bullets)
+        raw,ms,pt,ct,error=call_model(client,model,prompt); pred=safe_parse_json(raw); gold=gold_record(r)
+        predictions.append(pred); golds.append(gold); raws.append(raw); latencies.append(ms)
+        rows.append({"item_id":str(r.item_id),"raw":raw,"prediction":pred,"gold":gold,
+                     "source":title+" "+bullets,"error":error,"latency_ms":ms,
+                     "prompt_tokens":pt,"completion_tokens":ct})
+    metrics=evaluate_batch(predictions,golds,raws,[x["source"] for x in rows])
+    good=sorted(x for x in latencies if x>0)
+    if good:
+        metrics.update({"latency_mean_ms":sum(good)/len(good),
+            "latency_p50_ms":good[int(.50*(len(good)-1))],"latency_p95_ms":good[int(.95*(len(good)-1))]})
+    metrics["request_failure_rate"]=sum(bool(x["error"]) for x in rows)/len(rows)
+    metrics["total_prompt_tokens"]=sum(x["prompt_tokens"] or 0 for x in rows)
+    metrics["total_completion_tokens"]=sum(x["completion_tokens"] or 0 for x in rows)
+    row_em=[float(all(str(p.get(k) or "").strip().casefold()==str(g.get(k) or "").strip().casefold()
+                 for k in ("brand","color","product_type","style","material","model_number")))
+            for p,g in zip(predictions,golds)]
+    return {"strategy":name,"metrics":metrics,"rows":rows,"row_exact_match":row_em}
 
 def main():
-
-    mlflow.set_experiment("LLM_Prompt_Benchmark")
-
-    with mlflow.start_run(
-        run_name=f"{PROVIDER}_{MODEL}_{datetime.now().strftime('%H%M%S')}"
-    ):
-
-        mlflow.log_param("provider", PROVIDER)
-        mlflow.log_param("model", MODEL)
-        mlflow.log_param("temperature", TEMPERATURE)
-        mlflow.log_param("samples", N_SAMPLES)
-
-        print(f"Provider : {PROVIDER}")
-        print(f"Model    : {MODEL}")
-
-        df = load_data("data/final_clean_amazon.jsonl")
-
-        print(f"Loaded {len(df)} products")
-
-        examples = prepare_examples(df, n=4)
-
-        test_df = df.sample(
-            n=min(N_SAMPLES, len(df)),
-            random_state=42,
-        )
-
-        strategies = [
-            ("zero_shot", zero_shot_prompt),
-            ("few_shot", few_shot_prompt),
-            ("cot", cot_prompt),
-            ("structured", structured_prompt),
-        ]
-
-        all_results = []
-
-        for name, prompt_fn in strategies:
-
-            result = run_strategy(
-                name,
-                prompt_fn,
-                test_df,
-                examples if name == "few_shot" else None,
-            )
-
-            all_results.append(result)
-
-            for metric_name, value in result["metrics"].items():
-                mlflow.log_metric(
-                    f"{name}_{metric_name}",
-                    value,
-                )
-
-            print(
-                f"{name:12s}  Overall={result['metrics'].get('overall',0):.3f}"
-            )
-
-        os.makedirs("results", exist_ok=True)
-
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        filename = (
-            f"{PROVIDER}_{MODEL.replace('/','_')}_{timestamp}.json"
-        )
-
-        output_path = os.path.join("results", filename)
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(
-                all_results,
-                f,
-                indent=2,
-                ensure_ascii=False,
-            )
-
-        mlflow.log_artifact(output_path)
-
-        print("\nResults saved to:")
-        print(output_path)
-
-        print("\nMLflow logging completed.")
-
-
-if __name__ == "__main__":
-    main()
+    provider=os.getenv("PROVIDER","groq").lower(); model=os.getenv("MODEL_NAME",DEFAULT_MODELS.get(provider,""))
+    seed=int(os.getenv("RANDOM_SEED","42")); df=load_data(os.getenv("DATA_PATH","data/final_clean_amazon.jsonl"))
+    train,demo_df,test=split_data(df,float(os.getenv("TEST_SIZE",".2")),int(os.getenv("DEMO_SIZE","4")),seed)
+    size=int(os.getenv("SAMPLE_SIZE","200"))
+    if size>0: test=test.sample(n=min(size,len(test)),random_state=seed).sort_index()
+    demos=prepare_examples(demo_df,len(demo_df)); client=make_client(provider)
+    strategies=[x.strip() for x in os.getenv("STRATEGIES",",".join(PROMPT_MAP)).split(",") if x.strip()]
+    if set(strategies)-set(PROMPT_MAP): raise ValueError("Unknown strategy requested")
+    mlflow.set_experiment("LLM_Prompt_Benchmark"); results=[]
+    with mlflow.start_run(run_name=provider+"_"+model+"_"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")):
+        mlflow.log_params({"provider":provider,"model":model,"seed":seed,"dataset_rows":len(df),
+                           "train_rows":len(train),"demo_rows":len(demo_df),"test_rows":len(test)})
+        mlflow.set_tags({"split_policy":"train-only-demonstrations; untouched-holdout",
+                         "dataset_path":os.getenv("DATA_PATH","data/final_clean_amazon.jsonl")})
+        for name in strategies:
+            result=run_strategy(name,PROMPT_MAP[name],test,demos,client,model); results.append(result)
+            for key,value in result["metrics"].items():
+                if isinstance(value,(int,float)): mlflow.log_metric(name+"_"+key,float(value))
+        baseline=next((x for x in results if x["strategy"]=="zero_shot"),None); comparisons={}
+        if baseline:
+            for item in results:
+                if item is baseline: continue
+                comparisons[item["strategy"]]={"paired_bootstrap":paired_bootstrap_ci(item["row_exact_match"],baseline["row_exact_match"]),
+                    "paired_sign_test":paired_sign_test(item["row_exact_match"],baseline["row_exact_match"])}
+        payload={"metadata":{"provider":provider,"model":model,"seed":seed,"dataset_rows":len(df),
+            "train_rows":len(train),"demo_ids":demo_df.item_id.astype(str).tolist(),
+            "test_ids":test.item_id.astype(str).tolist(),"timestamp_utc":datetime.now(timezone.utc).isoformat(),
+            "unsupported_metric_note":"Lexical evidence heuristic, not semantic fact checking."},
+            "results":results,"paired_comparisons_vs_zero_shot":comparisons}
+        Path("results").mkdir(exist_ok=True)
+        path=Path("results")/(provider+"_"+model.replace("/","_")+"_"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+".json")
+        path.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8"); mlflow.log_artifact(str(path))
+        print("Saved",path)
+if __name__=="__main__": main()
