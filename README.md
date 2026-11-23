@@ -155,3 +155,16 @@ The repository now includes the supplied universal rubric-generation framework a
 - [Rubric QA Specification](docs/RUBRIC_QA_SPEC.md) — validation rules for category names, immutable O1–O14 wording, sequential component IDs, CSV quoting/escaping, explicit/implicit alignment, and coverage checks.
 
 These documents preserve the supplied source specifications. They are evaluation methodology references; the rubric-generation and QA interfaces are not yet represented as completed product features merely by adding these documents.
+
+
+## Rubric Studio
+
+Rubric Studio turns a scenario prompt into an atomic binary evaluation rubric using the checked-in Universal Rubric Generation Guide. It appends the 14 fixed Overall Performance questions and runs deterministic QA before export.
+
+- Streamlit page: `dashboard/pages/3_Rubric_Studio.py`
+- API: `POST /rubrics/generate` (provider-backed generation) and `POST /rubrics/validate` (offline CSV validation)
+- QA engine: `backend/rubric_qa.py`
+- Generator prompt builder: `backend/rubric_generator.py`
+- QA specification: [Rubric QA Specification](docs/RUBRIC_QA_SPEC.md)
+
+Generation requires the selected provider key (`GROQ_API_KEY` or `OPENROUTER_API_KEY`) on the API service. Validation is deterministic and does not require an LLM. A generated rubric is not considered approved merely because it passes structural QA: domain owners should inspect the atomic criteria, quotations, and implicit assumptions before using it for model release decisions.
