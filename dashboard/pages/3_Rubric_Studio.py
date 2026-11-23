@@ -156,13 +156,29 @@ with tab_build:
                 for issue in warnings:
                     st.warning(f"Row {issue.get('row') or '—'} · {issue.get('layer', 'QA')}: {issue.get('message')}")
         preview = pd.DataFrame(qa.get("rows", []))
-        if not preview.empty:
+        expected_columns = [
+            "Rubric Component Number", "Rubric Parent Category",
+            "Rubric Sub-Category", "Rubric Component Name",
+            "Rubric Evaluation Question", "Implicit vs. Explicit in the Prompt",
+            "Direct Quotation from the Prompt (N/A if Implicit)",
+            "Implicit Logic (N/A if Explicit)", "Pass/Fail Criteria",
+        ]
+        looks_like_rubric = (
+            not preview.empty
+            and list(preview.columns) == expected_columns
+            and "Rubric Component Number" in preview.columns
+        )
+        if looks_like_rubric and status in {"PASS", "WARN"}:
             st.subheader("Rubric preview")
             st.caption("Check criterion wording, traceability and pass/fail conditions before saving.")
             st.dataframe(preview, use_container_width=True, hide_index=True)
-        st.download_button("Download rubric CSV", data=csv_text, file_name="evaluation_rubric.csv", mime="text/csv", use_container_width=True)
-        with st.expander("View raw CSV"):
-            st.code(csv_text, language="csv")
+            st.download_button("Download rubric CSV", data=csv_text, file_name="evaluation_rubric.csv", mime="text/csv", use_container_width=True)
+            with st.expander("Advanced · View validated CSV source"):
+                st.code(csv_text, language="csv")
+        else:
+            st.error("The model response did not produce a valid rubric table. It has been withheld from the preview and download. Try again or change the configured model.")
+            with st.expander("Technical QA details"):
+                st.json(qa)
         st.divider()
         st.subheader("Save this rubric version")
         with st.form("save_rubric_form"):
