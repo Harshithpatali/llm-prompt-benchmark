@@ -41,11 +41,13 @@ tab_generate, tab_library, tab_evaluate = st.tabs(["Generate & QA", "Rubric Libr
 
 with tab_generate:
     scenario = st.text_area("Scenario prompt", height=260, placeholder="Paste the full system/user scenario, constraints, edge cases and safety boundaries.")
-    a, b = st.columns(2)
-    with a:
-        generate = st.button("Generate rubric", type="primary", use_container_width=True, disabled=not scenario.strip())
-    with b:
-        uploaded = st.file_uploader("Or upload rubric CSV", type=["csv"], key="rubric_upload")
+    st.caption("The Universal Rubric Generation Guide and QA specification are built into the backend. You do not need to upload a rubric file.")
+    generate = st.button(
+        "Generate rubric",
+        type="primary",
+        use_container_width=True,
+        disabled=not scenario.strip(),
+    )
     if generate:
         try:
             with st.spinner("Generating and validating rubric..."):
@@ -59,11 +61,6 @@ with tab_generate:
                 st.session_state["rubric_model"] = model
         except requests.RequestException as exc:
             show_error(exc)
-    if uploaded is not None:
-        st.session_state["rubric_csv"] = uploaded.getvalue().decode("utf-8-sig")
-        st.session_state["rubric_qa"] = validate_csv(st.session_state["rubric_csv"])
-        st.session_state["rubric_provider"] = "uploaded"
-        st.session_state["rubric_model"] = "manual"
     csv_text = st.session_state.get("rubric_csv")
     qa = st.session_state.get("rubric_qa")
     if csv_text:
