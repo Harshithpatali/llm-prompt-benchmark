@@ -29,9 +29,25 @@ h1, h2, h3, h4, h5, h6,
   border-radius: 8px;
 }
 .stTextInput input, .stTextArea textarea, .stNumberInput input,
-[data-baseweb="select"] input, [data-baseweb="select"] div {
-  color: #f2f6ff !important;
+/* BaseWeb select: force a dark surface and readable selected/option text. */
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+  background: #17243a !important;
+  border: 1px solid #526887 !important;
+  border-radius: 10px !important;
 }
+[data-testid="stSelectbox"] [data-baseweb="select"] *,
+[data-testid="stMultiSelect"] [data-baseweb="select"] * {
+  color: #f4f7ff !important;
+  -webkit-text-fill-color: #f4f7ff !important;
+}
+[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"] {
+  background: #17243a !important;
+  color: #f4f7ff !important;
+}
+[role="option"] { color: #f4f7ff !important; }
+[role="option"]:hover { background: #2a3e60 !important; }
+[data-testid="stSelectbox"] svg { fill: #dce7fa !important; }
 .stTextInput input::placeholder, .stTextArea textarea::placeholder {
   color: #9aabc4 !important;
   opacity: 1;
