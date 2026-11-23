@@ -35,8 +35,9 @@ This roadmap separates existing repository capabilities from work still required
 
 - [x] Add offline judge-vs-human validation and reliability-analysis modules.
 - [x] Add reviewer agreement and annotation operational metric helpers.
-- [ ] Build annotation task creation, reviewer submission, and adjudication workflows.
-- [ ] Use pseudonymous reviewer IDs; do not expose personal details in public artifacts.
+- [x] Convert seller-support scenarios into unlabelled pending review tasks.
+- [x] Validate annotation submission fields and pseudonymous annotator identifiers.
+- [ ] Build persistent task assignment, reviewer submission, and adjudication workflows.
 - [ ] Connect collected human labels to calibration inputs through a validated data contract.
 - [x] Implement validation-only threshold selection and frozen holdout evaluation in the offline calibration module.
 - [ ] Show class support, confusion matrices, confidence intervals, and limitations in the dashboard.

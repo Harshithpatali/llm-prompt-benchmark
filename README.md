@@ -4,7 +4,7 @@
 
 This repository consolidates the structured prompt-benchmarking project with the evaluation, calibration, and human-review capabilities from [LLM Quality Intelligence Platform](https://github.com/Harshithpatali/llm-quality-intelligence-platform).
 
-The prompt benchmark remains a first-class research suite. The broader platform adds task-specific quality evaluation, human review, judge validation, calibration, experiment history, and operational monitoring.
+The prompt benchmark remains a first-class research suite. The broader platform adds task-specific quality evaluation, human-review preparation, judge validation, calibration, experiment history, and operational monitoring.
 
 ## Existing datasets
 
@@ -31,13 +31,15 @@ See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limita
 - Produces category-level lexical diagnostics and a Markdown report.
 - Has a manually triggered GitHub Actions workflow for reproducible runs.
 
-### Quality and reliability analysis
+### Human-review and reliability foundations
 
-- Validated loaders for the general benchmark and seller-support scenarios.
-- Reference-overlap diagnostics for general responses, explicitly labelled as lexical heuristics.
+- Converts seller-support scenarios into pending, unlabelled review tasks.
+- Validates human submissions using pseudonymous annotator IDs, evidence, confidence, and review dimensions.
 - Judge threshold calibration using validation labels and frozen evaluation on an untouched holdout.
 - Judge-versus-human agreement, confusion matrices, Cohen's kappa, class-level metrics, and bootstrap accuracy intervals.
 - Annotation summaries, inter-reviewer agreement, and deterministic risk-aware audit sampling.
+
+The review-task builder and submission validator are currently offline helpers. A persistent annotation UI and database-backed task lifecycle are still planned.
 
 ### Application foundation
 
@@ -59,9 +61,8 @@ See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limita
 
 The following remain implementation work:
 
-- Seller-support execution and a dedicated human-review interface.
+- Persistent annotation UI, task assignment, submissions, adjudication, and audit history.
 - Versioned rubrics and task-specific scoring for relevance, correctness, completeness, instruction following, groundedness, and policy compliance.
-- Human annotation UI, task assignment, submissions, and adjudication.
 - Evaluation run/trace persistence using PostgreSQL (Neon is the intended target).
 - Unified FastAPI endpoints and Streamlit quality-intelligence pages.
 - RAG evaluation when retrieval contexts and evidence references are available.

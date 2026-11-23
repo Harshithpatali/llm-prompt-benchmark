@@ -5,7 +5,7 @@
 The consolidated repository combines two complementary workflows:
 
 1. **Prompt benchmark research:** compare prompt strategies on identical held-out examples, initially focused on structured e-commerce attribute extraction.
-2. **LLM quality operations:** evaluate general responses, validate automated judges, collect human review, analyze disagreement, and persist quality history.
+2. **LLM quality operations:** evaluate general responses, validate automated judges, prepare human review, analyze disagreement, and persist quality history.
 
 The prompt benchmark remains a task-specific research suite. It is not replaced by one generic score.
 
@@ -40,7 +40,8 @@ Task-specific evaluators
   |-- groundedness / evidence checks (planned)
   `-- judge validation and calibration
           |
-          +------> Human annotation and adjudication (workflow planned)
+          +------> Pending review tasks and submission validation
+          |        (offline helpers; persistent workflow planned)
           |
           v
 Experiment and trace records
@@ -66,16 +67,16 @@ FastAPI service + Streamlit quality dashboard
 - `backend/calibration.py`: reviewer/judge reliability and validation/holdout threshold calibration.
 - `backend/judge_validation.py`: judge-vs-human validation and bootstrap accuracy intervals.
 - `backend/ops_metrics.py`: annotation summaries, reviewer agreement, and risk-aware audit sampling.
+- `backend/review_tasks.py`: seller-support review-task preparation and submission validation; no persistence.
 - `backend/evaluator.py`: lexical reference-overlap diagnostics only.
 - `backend/quality_datasets.py`: validated loaders for the two additional datasets.
 - Existing `data/`, `results/`, and `reports/` artifacts must be preserved.
 
 ## Components still to integrate
 
-- Seller-support execution and the human review interface.
+- Persistent annotation task assignment, submissions, adjudication, and audit history.
 - Versioned rubrics and general task-specific rubric scoring.
-- Human annotation task assignment, submissions, and adjudication.
-- Evaluation traces, review queues, audit history, and operational persistence.
+- Evaluation traces, review queues, and operational persistence.
 - A provider abstraction reconciled with the current prompt-benchmark API client.
 
 The companion quality-intelligence source contains Supabase-specific data access and API orchestration. Treat its schemas and contracts as references; do not copy its Supabase persistence code unchanged.
