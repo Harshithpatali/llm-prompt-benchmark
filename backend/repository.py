@@ -96,7 +96,8 @@ def create_review_tasks(tasks: list[dict[str, Any]]) -> int:
         task["candidate_response"], task["review_guidance"],
     ) for task in tasks]
     with connection() as conn:
-        with conn.cursor() as cursor:
+        cursor = conn.cursor()
+        try:
             cursor.executemany(
                 """
                 INSERT INTO public.annotation_tasks
@@ -107,6 +108,10 @@ def create_review_tasks(tasks: list[dict[str, Any]]) -> int:
                 """,
                 rows,
             )
+        finally:
+            close = getattr(cursor, "close", None)
+            if close:
+                close()
     return len(rows)
 
 
