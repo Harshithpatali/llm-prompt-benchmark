@@ -11,6 +11,29 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+st.markdown("""
+<style>
+:root { color-scheme: dark; }
+.block-container { max-width: 1180px; padding-top: 1.5rem; padding-bottom: 3rem; }
+[data-testid="stSidebar"] { border-right: 1px solid rgba(128,128,128,.18); }
+h1 { letter-spacing: -.035em; }
+h2, h3 { letter-spacing: -.02em; }
+div[data-testid="stMetric"] { background: rgba(128,128,128,.08); border: 1px solid rgba(128,128,128,.16); padding: 14px 16px; border-radius: 14px; }
+div[data-testid="stVerticalBlockBorderWrapper"] { border-radius: 16px; }
+.stButton > button, .stDownloadButton > button { border-radius: 11px; min-height: 2.8rem; font-weight: 600; }
+.stTextInput input, .stTextArea textarea, .stSelectbox [data-baseweb="select"] { border-radius: 10px; }
+div[data-testid="stAlert"] { border-radius: 12px; }
+div[data-testid="stTabs"] button { font-weight: 600; }
+.small-muted { color: rgba(180,180,180,.85); font-size: .9rem; }
+@media (max-width: 700px) {
+ .block-container { padding-left: 1rem; padding-right: 1rem; padding-top: .8rem; }
+ h1 { font-size: 1.8rem !important; }
+ h2 { font-size: 1.4rem !important; }
+ div[data-testid="stMetric"] { padding: 10px; }
+}
+</style>
+""", unsafe_allow_html=True)
+
 API_BASE_URL = os.getenv(
     "API_BASE_URL", "https://llm-prompt-benchmark.onrender.com"
 ).rstrip("/")
@@ -18,137 +41,39 @@ API_BASE_URL = os.getenv(
 
 def render_home() -> None:
     st.title("LLM Quality Intelligence")
-    st.caption(
-        "A unified workspace for prompt experiments, response evaluation, "
-        "human review, and model reliability."
-    )
+    st.caption("One workspace to benchmark prompts, inspect response quality, build evaluation rubrics and calibrate LLM judges.")
 
     try:
         response = requests.get(f"{API_BASE_URL}/database/health", timeout=8)
         if response.ok:
             health = response.json()
-            st.success(
-                f"Evaluation API connected · {health.get('database', 'PostgreSQL')}"
-            )
+            st.success(f"API connected · {health.get('database', 'PostgreSQL')}")
         else:
-            st.warning(
-                f"Evaluation API responded with HTTP {response.status_code}."
-            )
+            st.warning(f"API responded with HTTP {response.status_code}.")
     except requests.RequestException:
-        st.warning(
-            "Evaluation API is temporarily unavailable. "
-            "Local benchmark reports remain accessible."
-        )
+        st.warning("API is temporarily unavailable. Existing local benchmark reports may still be explored.")
 
-    st.divider()
-    st.subheader("Evaluation workspaces")
-    st.write(
-        "Choose a workspace. Existing prompt benchmark datasets "
-        "and experiment results are preserved."
-    )
-
-    left, right, third = st.columns(3, gap="large")
-    with left:
-        with st.container(border=True):
-            st.markdown("### 🧪 Human Quality Review")
-            st.write(
-                "Inspect candidate answers against their context, record "
-                "evidence-backed assessments, and review submitted annotations."
-            )
-            st.page_link(
-                review_page,
-                label="Open human review",
-                icon="🧪",
-                use_container_width=True,
-            )
-    with right:
-        with st.container(border=True):
-            st.markdown("### 📊 Prompt Benchmark")
-            st.write(
-                "Compare prompt strategies, inspect extraction metrics, "
-                "explore raw model outputs, and run live attribute extraction."
-            )
-            st.page_link(
-                benchmark_page,
-                label="Open prompt benchmark",
-                icon="📊",
-                use_container_width=True,
-            )
-    with third:
-        with st.container(border=True):
-            st.markdown("### 🧩 Rubric Studio")
-            st.write(
-                "Generate atomic Pass/Fail rubrics from scenario prompts "
-                "and run framework QA before export."
-            )
-            st.page_link(
-                rubric_page,
-                label="Open Rubric Studio",
-                icon="🧩",
-                use_container_width=True,
-            )
-
-    with st.container(border=True):
-        st.markdown("### ⚖️ Judge Calibration")
-        st.write(
-            "Collect expert criterion labels, adjudicate disagreements, "
-            "and measure LLM judge reliability."
-        )
-        st.page_link(
-            calibration_page,
-            label="Open judge calibration",
-            icon="⚖️",
-            use_container_width=True,
-        )
-
-    st.divider()
-    st.subheader("Platform capabilities")
-    cols = st.columns(4)
-    items = [
-        ("Prompt experiments", "Strategy comparison and extraction metrics"),
-        ("Response quality", "Task-level evaluation and diagnostics"),
-        ("Human review", "Evidence, confidence, and annotations"),
-        ("Reliability", "Latency, usage, audit trail, and calibration"),
+    st.subheader("Your workspaces")
+    st.write("Choose a task to get started.")
+    cards = [
+        ("🧩", "Rubric Studio", "Create a rubric from a scenario, run quality checks, save versions and evaluate responses.", rubric_page, "Start building"),
+        ("🧪", "Human Quality Review", "Review candidate answers, record evidence and submit structured human assessments.", review_page, "Review answers"),
+        ("⚖️", "Judge Calibration", "Compare expert labels with LLM judge decisions and identify unreliable criteria.", calibration_page, "Calibrate judge"),
+        ("📊", "Prompt Benchmark", "Compare prompt strategies, inspect extraction metrics and explore model outputs.", benchmark_page, "Explore benchmarks"),
     ]
-    for col, (heading, detail) in zip(cols, items):
-        with col:
-            st.markdown(f"**{heading}**")
-            st.caption(detail)
+    for row in range(2):
+        cols = st.columns(2, gap="large")
+        for col, item in zip(cols, cards[row*2:(row+1)*2]):
+            icon, title, desc, page, action = item
+            with col:
+                with st.container(border=True):
+                    st.markdown(f"### {icon} {title}")
+                    st.write(desc)
+                    st.page_link(page, label=action, use_container_width=True)
 
-    with st.expander("Data and evaluation notes"):
-        st.write(
-            "The repository includes an e-commerce extraction dataset, "
-            "authored general response cases, and authored seller-support "
-            "review scenarios. Synthetic starter scenarios are not real "
-            "customer records or validated gold labels. Lexical overlap "
-            "diagnostics are not semantic factuality checks."
-        )
+    st.subheader("Suggested workflow")
+    st.markdown("**1. Build a rubric** → **2. Approve a version** → **3. Evaluate a response** → **4. Collect expert labels** → **5. Measure judge agreement**")
+    with st.expander("About the data and metrics"):
+        st.write("Starter seller-support scenarios are authored examples, not real customer records or validated gold labels. Human agreement and judge reliability should only be interpreted after collecting sufficient independent expert annotations. Lexical overlap diagnostics are not semantic factuality checks.")
+    st.caption("FastAPI · Streamlit · Neon PostgreSQL")
 
-    st.caption("LLM Quality Intelligence · FastAPI + Streamlit + PostgreSQL")
-
-
-# Register every page with st.navigation. In navigation mode, st.page_link
-# must receive one of these Page objects rather than a path string.
-home_page = st.Page(render_home, title="Home", icon="🧭", default=True)
-review_page = st.Page(
-    "pages/2_Quality_Review.py", title="Human Quality Review", icon="🧪"
-)
-benchmark_page = st.Page(
-    "pages/1_Prompt_Benchmark.py", title="Prompt Benchmark", icon="📊"
-)
-rubric_page = st.Page("pages/3_Rubric_Studio.py", title="Rubric Studio", icon="🧩")
-calibration_page = st.Page(
-    "pages/4_Judge_Calibration.py", title="Judge Calibration", icon="⚖️"
-)
-
-navigation = st.navigation(
-    [
-        home_page,
-        review_page,
-        benchmark_page,
-        rubric_page,
-        calibration_page,
-    ],
-    position="hidden",
-)
-navigation.run()
