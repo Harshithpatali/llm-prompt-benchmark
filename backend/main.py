@@ -14,6 +14,8 @@ from pydantic import BaseModel, Field
 from backend import db, repository
 from backend.review_tasks import build_review_tasks, validate_annotation_submission
 from backend.rubric_generator import build_generation_prompt, parse_and_validate
+from backend import rubric_repository
+from backend.rubric_evaluator import evaluate_response
 from backend.rubric_qa import validate_csv
 from evaluation.metrics import safe_parse_json
 from prompts.prompt_templates import PROMPT_MAP
@@ -67,6 +69,25 @@ class RubricGenerateRequest(BaseModel):
     provider: str = Field(default="groq", pattern="^(groq|openrouter)$")
     model: str | None = Field(default=None, max_length=200)
 
+
+class RubricSaveRequest(BaseModel):
+    rubric_name: str = Field(min_length=2, max_length=200)
+    version_label: str = Field(min_length=1, max_length=80)
+    objective: str = Field(min_length=10, max_length=4000)
+    csv: str = Field(min_length=100, max_length=5_000_000)
+    generator_provider: str | None = None
+    generator_model: str | None = None
+    created_by: str = Field(min_length=1, max_length=120)
+
+class RubricApprovalRequest(BaseModel):
+    approver: str = Field(min_length=1, max_length=120)
+
+class RubricEvaluationRequest(BaseModel):
+    rubric_id: UUID
+    prompt: str = Field(min_length=1, max_length=30000)
+    response: str = Field(min_length=1, max_length=30000)
+    provider: str = Field(default="groq", pattern="^(groq|openrouter)$")
+    model: str | None = Field(default=None, max_length=200)
 
 class AnnotationDimensions(BaseModel):
     relevance: str
@@ -147,6 +168,79 @@ def validate_rubric(payload: dict[str, str]):
         raise HTTPException(400, "CSV is required and must be at most 5 MB")
     return validate_csv(csv_text)
 
+
+@app.post("/rubrics", status_code=201, dependencies=[Depends(require_review_api_key)])
+def save_rubric(req: RubricSaveRequest):
+    try:
+        qa = validate_csv(req.csv)
+        if qa["status"] == "FAIL":
+            raise HTTPException(422, {"message": "Rubric failed QA", "qa": qa})
+        return rubric_repository.save_rubric(
+            name=req.rubric_name, version=req.version_label, objective=req.objective,
+            csv_text=req.csv, provider=req.generator_provider, model=req.generator_model,
+            created_by=req.created_by,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.get("/rubrics")
+def list_saved_rubrics(limit: int = Query(default=50, ge=1, le=200),
+                       offset: int = Query(default=0, ge=0, le=100000)):
+    try:
+        return {"rubrics": rubric_repository.list_rubrics(limit, offset)}
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.get("/rubrics/{rubric_id}")
+def get_saved_rubric(rubric_id: UUID):
+    try:
+        rubric = rubric_repository.get_rubric(rubric_id)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+    if rubric is None:
+        raise HTTPException(404, "Rubric not found")
+    return rubric
+
+@app.post("/rubrics/{rubric_id}/approve", dependencies=[Depends(require_review_api_key)])
+def approve_saved_rubric(rubric_id: UUID, req: RubricApprovalRequest):
+    try:
+        return rubric_repository.approve_rubric(rubric_id, req.approver)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.post("/rubrics/evaluate", status_code=201, dependencies=[Depends(require_review_api_key)])
+def evaluate_with_rubric(req: RubricEvaluationRequest):
+    model = req.model or os.getenv("MODEL_NAME", "openai/gpt-oss-20b")
+    try:
+        return evaluate_response(rubric_id=req.rubric_id, provider=req.provider, model=model,
+            prompt=req.prompt, response=req.response, client=_client(req.provider))
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.get("/rubrics/evaluations/{evaluation_id}", dependencies=[Depends(require_review_api_key)])
+def get_rubric_evaluation(evaluation_id: UUID):
+    try:
+        result = rubric_repository.get_rubric_evaluation(evaluation_id)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+    if result is None:
+        raise HTTPException(404, "Rubric evaluation not found")
+    return result
+
+@app.get("/rubrics/{rubric_id}/evaluations", dependencies=[Depends(require_review_api_key)])
+def list_rubric_evaluations(rubric_id: UUID, limit: int = Query(default=20, ge=1, le=100)):
+    try:
+        if rubric_repository.get_rubric(rubric_id) is None:
+            raise HTTPException(404, "Rubric not found")
+        return {"evaluations": rubric_repository.list_rubric_evaluations(rubric_id, limit)}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
 
 @app.get("/health")
 def health():
