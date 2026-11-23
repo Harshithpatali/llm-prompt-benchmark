@@ -1,8 +1,17 @@
 """Rubric Studio: generation, QA, versioning, approvals and criterion evaluation."""
 import os
+import sys
+from pathlib import Path
+
 import requests
 import streamlit as st
 import pandas as pd
+
+# Streamlit Cloud may use dashboard/ as the import root. Add the repository
+# root explicitly so the shared backend package is importable from this page.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from backend.rubric_qa import validate_csv
 
