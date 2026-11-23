@@ -1,94 +1,59 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-import json
+"""FastAPI extraction service sharing the prompt registry."""
+import json, os
 from pathlib import Path
-from openai import OpenAI
-import os
+from typing import Any, Dict
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-
+from openai import OpenAI
+from prompts.prompt_templates import PROMPT_MAP
+from evaluation.metrics import safe_parse_json
 load_dotenv()
-
-app = FastAPI(title="LLM Prompt Benchmark API", version="1.0")
-
-# ---------- Models ----------
+app=FastAPI(title="LLM Prompt Benchmark API",version="2.0")
+RESULTS_DIR=Path(os.getenv("RESULTS_DIR","results")).resolve()
 class ExtractRequest(BaseModel):
-    item_name: str
-    bullet_points: str
-    strategy: str = "structured"          # zero_shot | few_shot | cot | structured
-
+    item_name:str=Field(min_length=1,max_length=500)
+    bullet_points:str=Field(default="",max_length=12000)
+    strategy:str="structured"
+    provider:str="groq"
+    model:str|None=None
 class ExtractResponse(BaseModel):
-    strategy: str
-    prediction: Dict[str, Any]
-    raw_output: str
-
-# ---------- LLM Client ----------
-client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
-)
-MODEL = "llama-3.3-70b-versatile"
-
-from prompts.prompt_templates import (
-    zero_shot_prompt, few_shot_prompt, cot_prompt, structured_prompt
-)
-
-PROMPT_MAP = {
-    "zero_shot": zero_shot_prompt,
-    "cot": cot_prompt,
-    "structured": structured_prompt,
-}
-
-def call_llm(prompt: str) -> str:
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0,
-        max_tokens=1024,
-    )
-    return response.choices[0].message.content
-
-# ---------- Routes ----------
-@app.get("/")
-def root():
-    return {"message": "LLM Prompt Benchmark API is running"}
-
-@app.post("/extract", response_model=ExtractResponse)
-def extract_attributes(req: ExtractRequest):
-    if req.strategy not in PROMPT_MAP and req.strategy != "few_shot":
-        raise HTTPException(status_code=400, detail="Invalid strategy")
-
-    if req.strategy == "few_shot":
-        # For simplicity we use structured as fallback in API
-        # (you can load real examples if needed)
-        prompt = structured_prompt(req.item_name, req.bullet_points)
-    else:
-        prompt_fn = PROMPT_MAP[req.strategy]
-        prompt = prompt_fn(req.item_name, req.bullet_points)
-
-    raw = call_llm(prompt)
-    
-    from evaluation.metrics import safe_parse_json
-    prediction = safe_parse_json(raw)
-
-    return ExtractResponse(
-        strategy=req.strategy,
-        prediction=prediction,
-        raw_output=raw
-    )
-
+    strategy:str
+    provider:str
+    model:str
+    prediction:Dict[str,Any]
+    raw_output:str
+def _client(provider):
+    configs={"groq":("GROQ_API_KEY","https://api.groq.com/openai/v1"),
+             "openrouter":("OPENROUTER_API_KEY","https://openrouter.ai/api/v1")}
+    if provider not in configs:raise HTTPException(400,"Unsupported provider")
+    key,base=configs[provider]
+    if not os.getenv(key):raise HTTPException(503,key+" is not configured")
+    return OpenAI(api_key=os.getenv(key),base_url=base)
+@app.get("/health")
+def health():return {"status":"ok"}
+@app.get("/strategies")
+def strategies():return {"strategies":list(PROMPT_MAP)}
+@app.post("/extract",response_model=ExtractResponse)
+def extract(req:ExtractRequest):
+    if req.strategy not in PROMPT_MAP:raise HTTPException(400,"Invalid strategy")
+    if req.strategy=="few_shot":raise HTTPException(400,"Few-shot requires training demonstrations; use the benchmark runner")
+    model=req.model or os.getenv("MODEL_NAME","llama-3.1-8b-instant")
+    prompt=PROMPT_MAP[req.strategy](req.item_name,req.bullet_points)
+    try:
+        response=_client(req.provider).chat.completions.create(model=model,messages=[{"role":"user","content":prompt}],temperature=0,max_tokens=512)
+        raw=response.choices[0].message.content or ""
+    except Exception as exc:raise HTTPException(502,"LLM provider request failed: "+type(exc).__name__) from exc
+    prediction=safe_parse_json(raw)
+    if not prediction:raise HTTPException(502,"Provider returned invalid JSON")
+    return ExtractResponse(strategy=req.strategy,provider=req.provider,model=model,prediction=prediction,raw_output=raw)
 @app.get("/results")
 def list_results():
-    results_dir = Path("results")
-    if not results_dir.exists():
-        return []
-    files = sorted(results_dir.glob("*.json"), reverse=True)
-    return [f.name for f in files]
-
+    RESULTS_DIR.mkdir(parents=True,exist_ok=True)
+    return sorted(p.name for p in RESULTS_DIR.glob("*.json") if p.is_file())
 @app.get("/results/{filename}")
-def get_result(filename: str):
-    path = Path("results") / filename
-    if not path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-    with open(path) as f:
-        return json.load(f)
+def get_result(filename:str):
+    if Path(filename).name!=filename or not filename.endswith(".json"):raise HTTPException(400,"Invalid result filename")
+    path=(RESULTS_DIR/filename).resolve()
+    if path.parent!=RESULTS_DIR or not path.is_file():raise HTTPException(404,"Result not found")
+    return json.loads(path.read_text(encoding="utf-8"))
