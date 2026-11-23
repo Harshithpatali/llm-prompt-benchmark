@@ -1,48 +1,94 @@
-# LLM Prompt Evaluation & Benchmarking Framework
+# LLM Quality Intelligence Platform
 
-A reproducible evaluation harness for structured product-attribute extraction from e-commerce text. It compares prompting strategies on identical held-out examples and reports quality, reliability and latency.
+Prompt benchmarking, model evaluation, and quality reliability analysis in one reproducible platform.
 
-## Implemented
-- Zero-shot, few-shot, chain-of-thought instruction, structured JSON and role-based prompting.
-- Groq and OpenRouter-compatible API clients.
-- Leakage-safe deterministic split: demonstrations are sampled only from training rows; test and demo IDs are recorded.
-- Exact match, per-attribute precision/recall/F1, micro/macro F1, JSON validity, missing attributes, coverage and lexical unsupported-value rate.
-- Paired bootstrap confidence intervals and exact paired sign test versus zero-shot.
-- Latency percentiles, token usage, retry/failure reporting and MLflow artifacts.
-- Offline unit tests and GitHub Actions CI.
-- FastAPI extraction API with safe result-file resolution.
+This repository consolidates the structured prompt-benchmarking project with the evaluation, calibration, and human-review capabilities from [LLM Quality Intelligence Platform](https://github.com/Harshithpatali/llm-quality-intelligence-platform).
 
-## Experimental protocol
-Split the data before selecting few-shot examples. Every prompt strategy is evaluated on the same untouched holdout. Each result records dataset size, split IDs, seed, raw outputs, predictions, labels and per-row outcomes. Use a sufficiently large holdout and report uncertainty; a small run is exploratory, not conclusive.
+## Existing research assets
 
-The unsupported-value metric is a lexical heuristic, not a semantic hallucination detector. The optional judge is supplementary and must be calibrated against human annotations before being treated as reliable. Bootstrap intervals do not correct dataset bias or provider/model drift.
+- `data/final_clean_amazon.jsonl`: structured product attribute extraction benchmark.
+- Five prompt strategies: zero-shot, few-shot, chain-of-thought instruction, structured JSON, and role-based.
+- Extraction metrics: exact match, attribute precision/recall/F1, micro/macro F1, JSON validity, coverage, missing attributes, lexical unsupported-value rate, latency, token usage, and request failures.
+- Paired bootstrap confidence intervals and paired sign tests.
+- Saved raw results and Markdown experiment reports.
+- FastAPI extraction API, Streamlit dashboard, and GitHub Actions workflows.
 
-## Setup
-Create a virtual environment and install requirements. Set GROQ_API_KEY or OPENROUTER_API_KEY in .env. Configure PROVIDER, MODEL_NAME, SAMPLE_SIZE (200 by default; 0 means full holdout), TEST_SIZE, DEMO_SIZE, RANDOM_SEED, STRATEGIES, TEMPERATURE and MAX_TOKENS.
+The consolidated platform will also incorporate:
+- `data/benchmark.jsonl`: 60 general response-quality starter cases from the companion repository.
+- `data/seller_support_tasks.json`: 16 seller-support review scenarios from the companion repository.
+- Versioned rubrics, judge validation, human annotations, adjudication, reviewer agreement, calibration, evaluation traces, review queues, and audit history.
 
-Run offline tests with: pytest -q
+These additional capabilities are the integration target; they are not all implemented or wired into this repository yet.
 
-Run a live benchmark with: python -m experiments.run_experiment
+## Quality evaluation principles
 
-Live benchmarking requires provider credentials and makes external API calls.
+Keep task-specific metrics separate. Product attribute F1, customer-support policy scores, and RAG faithfulness are not interchangeable. Store metric definitions, scales, dataset versions, prompt versions, and evaluator versions with every run.
 
-## Run the 200-sample benchmark on GitHub Actions
+The unsupported-value metric in the extraction benchmark is a lexical evidence heuristic, not semantic hallucination detection. LLM-as-judge scores remain supplementary until validated against independent human annotations. Authored or synthetic scenarios are not real customer data or externally validated gold standards.
 
-1. In repository Settings → Secrets and variables → Actions, add `GROQ_API_KEY` (or `OPENROUTER_API_KEY` if using OpenRouter). Never commit provider keys or paste them into source files.
-2. Open Actions → **200-sample LLM prompt benchmark** → Run workflow.
-3. Keep sample size at `200` and select the provider matching the configured secret.
-4. The workflow evaluates all five strategies on the same 200 held-out products (up to 1,000 model requests), creates a Markdown comparison report and raw JSON artifact, then commits both directly to `main`.
+## Local setup
 
-Workflow results include exact match, attribute-level and micro/macro F1, JSON validity, latency, token counts, request failures, paired bootstrap confidence intervals and paired sign-test p-values. Review failure rates before interpreting comparisons. API usage may incur provider charges or be subject to rate limits.
+Use Python 3.11 or compatible.
 
+```bash
+python -m venv .venv
+# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-## API
-Start with: uvicorn backend.main:app --reload --port 8000
+Set provider credentials in a local `.env` file. Never commit API keys.
 
-Routes: GET /health, GET /strategies, POST /extract, GET /results, GET /results/{filename}.
+```env
+PROVIDER=groq
+GROQ_API_KEY=your_key
+MODEL_NAME=openai/gpt-oss-20b
+SAMPLE_SIZE=200
+TEST_SIZE=0.20
+DEMO_SIZE=4
+RANDOM_SEED=42
+TEMPERATURE=0
+MAX_TOKENS=512
+```
 
-## Limitations
-Exact match is strict; semantic similarity requires separately validated scoring. The lexical unsupported-value heuristic can flag paraphrases and miss plausible errors. Judge scores require human calibration. Monetary cost is not estimated without a maintained provider price table. Audit dataset labels, duplicates, provenance and category balance before making general claims.
+For OpenRouter, configure `OPENROUTER_API_KEY` and set `PROVIDER=openrouter`.
+
+### Run offline tests
+
+```bash
+pytest -q
+```
+
+### Run the prompt benchmark
+
+Live runs call an external model API and may incur provider charges or rate limits.
+
+```bash
+python -m experiments.run_experiment
+python -m experiments.build_report
+```
+
+### Start the API and dashboard
+
+```bash
+uvicorn backend.main:app --reload --port 8000
+streamlit run dashboard/app.py
+```
+
+Current API routes: `GET /health`, `GET /strategies`, `POST /extract`, `GET /results`, and `GET /results/{filename}`.
+
+## Architecture and roadmap
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md). Neon PostgreSQL is the intended persistence target. The old Supabase-specific data-access code must be replaced with a native PostgreSQL repository layer; do not assume changing a connection URL is sufficient.
+
+## Reproducibility
+
+Record provider, exact model, dataset version, split seed and IDs, prompt version, evaluator/rubric version, generation settings, and timestamp. Do not tune on the final holdout. Review API failures and effective sample size before interpreting results.
+
+## Security
+
+Keep API keys and database URLs in environment variables or deployment secrets. Do not store personal customer data in the public benchmark repository.
 
 ## License
+
 MIT
