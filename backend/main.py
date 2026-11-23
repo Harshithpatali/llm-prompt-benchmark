@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from backend import db, repository
 from backend.review_tasks import build_review_tasks, validate_annotation_submission
-from backend.rubric_generator import build_generation_prompt, normalize_csv
+from backend.rubric_generator import build_generation_prompt, parse_and_validate
 from backend.rubric_qa import validate_csv
 from evaluation.metrics import safe_parse_json
 from prompts.prompt_templates import PROMPT_MAP
@@ -131,8 +131,7 @@ def generate_rubric(req: RubricGenerateRequest):
             max_tokens=12000,
         )
         raw = response.choices[0].message.content or ""
-        csv_text = normalize_csv(raw)
-        qa = validate_csv(csv_text)
+        csv_text, qa = parse_and_validate(raw)
         return {"provider": req.provider, "model": model, "csv": csv_text, "qa": qa}
     except HTTPException:
         raise
