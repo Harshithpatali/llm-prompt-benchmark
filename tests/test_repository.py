@@ -10,6 +10,10 @@ class FakeCursor:
         self.executed = []
         self.batch = None
 
+    def __call__(self):
+        # Psycopg exposes cursor() as a factory; return this fake cursor.
+        return self
+
     def execute(self, query, params):
         self.executed.append((query, params))
         return self
