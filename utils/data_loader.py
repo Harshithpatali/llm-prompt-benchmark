@@ -12,6 +12,7 @@ def _normalise_value(value):
 
 def load_data(path="data/final_clean_amazon.jsonl"):
     df = pd.read_json(path, lines=True)
+    input_rows = int(len(df))
     if "item_id" not in df:
         raise ValueError("Dataset must contain item_id")
     if "item_name" not in df and "title" in df:
@@ -61,7 +62,7 @@ def load_data(path="data/final_clean_amazon.jsonl"):
 
     df = df.loc[kept].copy().reset_index(drop=True)
     audit = {
-        "input_rows": int(len(pd.read_json(path, lines=True))),
+        "input_rows": input_rows,
         "duplicate_id_groups": duplicate_groups,
         "duplicate_rows_involved": duplicate_rows,
         "conflicting_id_groups_excluded": len(conflicting_ids),
