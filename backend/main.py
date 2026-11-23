@@ -1,5 +1,6 @@
 """FastAPI service for prompt extraction, experiment history and human review."""
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,7 @@ from evaluation.metrics import safe_parse_json
 from prompts.prompt_templates import PROMPT_MAP
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 app = FastAPI(title="LLM Quality Intelligence API", version="3.1")
 RESULTS_DIR = Path(os.getenv("RESULTS_DIR", "results")).resolve()
 
@@ -408,6 +410,10 @@ def seed_review_tasks():
         return {"source": "seller_support_tasks", "tasks_in_source": len(tasks),
                 "inserted_or_existing": inserted}
     except Exception as exc:
+        # Keep the client response generic, but retain the full exception in
+        # Render logs so operational failures can be diagnosed without exposing
+        # database details or credentials to reviewers.
+        logger.exception("Failed to seed authored human-review tasks")
         raise _database_http_error(exc) from exc
 
 
