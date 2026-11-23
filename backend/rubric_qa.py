@@ -56,6 +56,10 @@ def validate_csv(content: str) -> dict[str, Any]:
         return {"status":"FAIL","issues":[asdict(Issue("structure","error",None,"CSV is empty"))],"counts":{},"rows":[]}
     if rows[0] != HEADERS:
         issues.append(Issue("structure","error",1,"Header must exactly match the required nine-column header"))
+    raw_lines = [line for line in content.splitlines() if line.strip()]
+    for line_number, line in enumerate(raw_lines, start=1):
+        if not (line.startswith('"') and line.endswith('"')):
+            issues.append(Issue("quotation","error",line_number,"Every CSV field must be enclosed in straight double quotes"))
     data = rows[1:]
     for i, row in enumerate(data, start=2):
         if len(row) != 9:
