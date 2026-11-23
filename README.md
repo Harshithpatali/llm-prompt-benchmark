@@ -168,3 +168,26 @@ Rubric Studio turns a scenario prompt into an atomic binary evaluation rubric us
 - QA specification: [Rubric QA Specification](docs/RUBRIC_QA_SPEC.md)
 
 Generation requires the selected provider key (`GROQ_API_KEY` or `OPENROUTER_API_KEY`) on the API service. Validation is deterministic and does not require an LLM. A generated rubric is not considered approved merely because it passes structural QA: domain owners should inspect the atomic criteria, quotations, and implicit assumptions before using it for model release decisions.
+
+
+## Rubric lifecycle and criterion-level evaluation
+
+Rubric Studio now supports a versioned lifecycle backed by Neon:
+
+1. Generate or upload a rubric and run the deterministic Universal Rubric QA checks.
+2. Save QA-valid CSV versions as immutable named versions. Each saved version retains its source CSV, SHA-256 digest, generator metadata and QA report.
+3. An authenticated reviewer approves a draft. Approval is audited; only approved versions can be used for model judging.
+4. Evaluate a prompt/response pair against every C and O criterion. Criterion verdicts, evidence, rationale and confidence are stored separately from the summary.
+5. Retrieve evaluation details and compare evaluation history for a rubric version.
+
+### Rubric lifecycle API
+
+- `POST /rubrics` — save a QA-valid draft (requires `X-Review-API-Key`).
+- `GET /rubrics` and `GET /rubrics/{rubric_id}` — list and retrieve versions.
+- `POST /rubrics/{rubric_id}/approve` — approve a draft (requires `X-Review-API-Key`).
+- `POST /rubrics/evaluate` — judge a prompt/response against an approved rubric (requires `X-Review-API-Key`).
+- `GET /rubrics/{rubric_id}/evaluations` and `GET /rubrics/evaluations/{evaluation_id}` — retrieve judge history and criterion details.
+
+Migration: `migrations/002_rubric_lifecycle.sql`. The migration adds rubric source/version metadata and the `rubric_evaluations` and `rubric_criterion_scores` tables.
+
+**Evaluation integrity:** LLM judge scores are model-generated estimates, not ground truth. Inspect evidence and rationale and route consequential decisions through human review. The evaluator rejects missing, duplicate or unknown criterion IDs and does not allow draft rubrics to be used for scoring.
