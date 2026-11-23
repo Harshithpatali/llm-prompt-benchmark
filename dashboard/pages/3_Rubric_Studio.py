@@ -62,10 +62,22 @@ page_header("Evaluation design", "Rubric Studio", "Generate traceable criteria f
 
 with st.sidebar:
     st.subheader("Generation settings")
-    provider = st.selectbox("Model provider", ["groq", "openrouter"], index=0, format_func=lambda value: "Groq" if value == "groq" else "OpenRouter", help="Choose a provider whose API key is configured on the Render backend.")
-    model = st.text_input("Model ID", value=DEFAULT_MODEL)
+    provider = st.selectbox(
+        "Model provider", ["groq", "openrouter", "gemini"],
+        index=0,
+        format_func=lambda value: {"groq": "Groq", "openrouter": "OpenRouter", "gemini": "Google Gemini"}[value],
+        help="Choose a provider whose API key is configured on the Render backend.",
+    )
+    default_model = (
+        os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        if provider == "gemini" else DEFAULT_MODEL
+    )
+    model = st.text_input("Model ID", value=default_model,
+                          help="Gemini default: gemini-2.5-flash. You can override it if your API project supports another model.")
     st.divider()
-    st.caption("Rubric generation uses the model provider configured on the API. The framework and QA rules are built in.")
+    st.caption("Rubric generation uses the selected provider configured on the Render API. The framework and QA rules are built in.")
+    if provider == "gemini":
+        st.info("Add GEMINI_API_KEY to the Render API environment. Do not paste the key into this dashboard or the review API key field.")
     if not secret("REVIEW_API_KEY"):
         st.markdown("**Reviewer access**")
         st.caption("This key protects write actions across the platform. It is not needed to generate a rubric.")
