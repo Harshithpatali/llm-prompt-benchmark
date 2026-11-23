@@ -62,7 +62,7 @@ page_header("Evaluation design", "Rubric Studio", "Generate traceable criteria f
 
 with st.sidebar:
     st.subheader("Generation settings")
-    provider = st.selectbox("Model provider", ["groq", "openrouter"], help="Choose the configured provider on the API service.")
+    provider = st.selectbox("Model provider", ["groq", "openrouter"], index=0, format_func=lambda value: "Groq" if value == "groq" else "OpenRouter", help="Choose a provider whose API key is configured on the Render backend.")
     model = st.text_input("Model ID", value=DEFAULT_MODEL)
     st.divider()
     st.caption("Rubric generation uses the model provider configured on the API. The framework and QA rules are built in.")
@@ -98,6 +98,7 @@ with tab_build:
             max_chars=30000,
             placeholder="Example: You are a customer-support assistant. Answer only from the supplied policy...\n\nRequirements:\n- ...\n- ...",
             help="Use the complete scenario. Very long prompts may exceed the model provider's token budget.",
+            key="rubric_scenario_input",
         )
         left, right = st.columns(2)
         with left:
@@ -106,8 +107,11 @@ with tab_build:
         with right:
             st.caption("Also include")
             st.markdown("- Edge cases and conflict handling\n- Required output structure\n- Actions and verification, if relevant")
-        generate = st.form_submit_button("Generate rubric", type="primary", use_container_width=True, disabled=len(scenario.strip()) < 10)
+        generate = st.form_submit_button("Generate rubric", type="primary", use_container_width=True)
     if generate:
+        if len(scenario.strip()) < 10:
+            st.error("Enter a scenario of at least 10 characters before generating a rubric.")
+            st.stop()
         st.session_state["rubric_scenario"] = scenario
         st.session_state.pop("rubric_csv", None)
         try:
