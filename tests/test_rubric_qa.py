@@ -2,6 +2,7 @@ import csv
 import io
 
 from backend.rubric_qa import HEADERS, OVERALL_ROWS, validate_csv
+from backend.rubric_generator import append_canonical_overall_rows
 
 def make_csv():
     rows = [HEADERS]
@@ -50,3 +51,15 @@ def test_wrong_parent_category_fails():
     out=io.StringIO()
     csv.writer(out,quoting=csv.QUOTE_ALL).writerows(rows)
     assert validate_csv(out.getvalue())["status"]=="FAIL"
+
+
+def test_generator_replaces_model_overall_rows_with_canonical_reference():
+    rows=list(csv.reader(io.StringIO(make_csv())))
+    rows[-1][3]="Model altered holistic label"
+    out=io.StringIO()
+    csv.writer(out,quoting=csv.QUOTE_ALL).writerows(rows)
+    rebuilt=append_canonical_overall_rows(out.getvalue())
+    parsed=list(csv.reader(io.StringIO(rebuilt)))
+    assert parsed[-1][0]=="O14"
+    assert parsed[-1][3]==OVERALL_ROWS[-1][2]
+    assert validate_csv(rebuilt)["status"]=="PASS"
