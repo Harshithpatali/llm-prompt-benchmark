@@ -6,6 +6,20 @@ This repository consolidates the structured prompt-benchmarking project with the
 
 The prompt benchmark remains a first-class research suite. The broader platform adds task-specific quality evaluation, human-review preparation, judge validation, calibration, experiment history, and operational monitoring.
 
+## Google Gemini provider
+
+Rubric generation and rubric-based evaluation support Google Gemini through Google's
+OpenAI-compatible API endpoint.
+
+Configure these variables on the **Render backend service** (not Streamlit Cloud):
+
+- `GEMINI_API_KEY`: API key created in Google AI Studio.
+- `GEMINI_MODEL` (optional): model ID; defaults to `gemini-2.5-flash`.
+
+In Rubric Studio, select **Google Gemini** and keep the suggested model unless you
+have verified another model is enabled for your API key. Never commit API keys or
+paste them into the reviewer-access field. That field is only for `REVIEW_API_KEY`.
+
 ## Existing datasets
 
 - `data/final_clean_amazon.jsonl`: structured e-commerce product-attribute extraction data.
