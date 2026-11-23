@@ -5,6 +5,13 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(page_title="Judge Calibration", page_icon="⚖️", layout="wide")
+import sys
+from pathlib import Path
+DASHBOARD_DIR = Path(__file__).resolve().parents[1]
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.insert(0, str(DASHBOARD_DIR))
+from ui import apply_theme, page_header
+apply_theme()
 API_URL = os.getenv("API_BASE_URL", "https://llm-prompt-benchmark.onrender.com").rstrip("/")
 
 
@@ -28,8 +35,7 @@ def api(method, path, **kwargs):
     return response.json() if response.content else {}
 
 
-st.title("⚖️ Judge Calibration")
-st.caption("Compare LLM judge decisions with independent expert labels, resolve disagreements and measure criterion-level reliability.")
+page_header("Reliability & governance", "Judge Calibration", "Compare LLM judge decisions with independent expert labels, resolve disagreements and measure criterion-level reliability.")
 
 with st.sidebar:
     st.subheader("Reviewer access")
