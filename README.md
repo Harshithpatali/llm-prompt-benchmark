@@ -39,7 +39,7 @@ See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limita
 - Judge-versus-human agreement, confusion matrices, Cohen's kappa, class-level metrics, and bootstrap accuracy intervals.
 - Annotation summaries, inter-reviewer agreement, and deterministic risk-aware audit sampling.
 
-The review-task builder and submission validator are currently offline helpers. A persistent annotation UI and database-backed task lifecycle are still planned.
+The review workflow is database-backed: 16 authored starter scenarios can be seeded idempotently, reviewers can submit validated annotations, task status changes transactionally, and each submission creates an audit event. The Streamlit reviewer workspace is available at `dashboard/pages/2_Quality_Review.py`. The starter scenarios are unlabelled examples, not real customer data or gold labels.
 
 ### Application foundation
 
@@ -61,7 +61,7 @@ The review-task builder and submission validator are currently offline helpers. 
 
 - Initial PostgreSQL schema is checked in at `migrations/001_initial_schema.sql`.
 - `backend/db.py` provides a lazy, TLS-required psycopg connection boundary.
-- The schema was validated on a temporary Neon branch and discarded after testing; it has **not** been applied to the default branch. The existing API and dashboard are not yet database-backed.
+- The initial schema has been applied to the Neon production database. The deployed API's `GET /database/health` endpoint has returned a successful connection to `neondb`.
 - See [database setup and migration instructions](database/README.md).
 
 ## Planned integration
@@ -133,7 +133,7 @@ uvicorn backend.main:app --reload --port 8000
 streamlit run dashboard/app.py
 ```
 
-Current API routes: `GET /health`, `GET /strategies`, `POST /extract`, `GET /results`, and `GET /results/{filename}`.
+Current API routes include `GET /health`, `GET /database/health`, `GET /strategies`, `POST /extract`, experiment history under `/quality/runs`, and reviewer operations under `/quality/review-tasks` and `/quality/annotations`. Reviewer routes require the `X-Review-API-Key` header.
 
 ## Reproducibility
 
