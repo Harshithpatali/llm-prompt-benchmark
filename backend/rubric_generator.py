@@ -51,7 +51,7 @@ def append_canonical_overall_rows(raw: str) -> str:
         for number, subcategory, name, question in OVERALL_ROWS
     ]
     output = io.StringIO()
-    writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\\n")
+    writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\n")
     writer.writerow(HEADERS)
     writer.writerows(atomic + canonical)
     return output.getvalue()
