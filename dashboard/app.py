@@ -65,3 +65,18 @@ def render_home() -> None:
         st.write("Starter seller-support scenarios are authored examples, not real customer records or validated gold labels. Human agreement and judge reliability should only be interpreted after collecting sufficient independent expert annotations. Lexical overlap diagnostics are not semantic factuality checks.")
     st.caption("FastAPI · Streamlit · Neon PostgreSQL")
 
+
+
+# Streamlit's multipage router must be run explicitly. Keeping the entrypoint
+# responsible for routing also ensures page_link targets are valid Page objects.
+home_page = st.Page(render_home, title="Overview", icon="🧭", default=True)
+rubric_page = st.Page("pages/3_Rubric_Studio.py", title="Rubric Studio", icon="🧩")
+review_page = st.Page("pages/2_Quality_Review.py", title="Human Quality Review", icon="🧪")
+calibration_page = st.Page("pages/4_Judge_Calibration.py", title="Judge Calibration", icon="⚖️")
+benchmark_page = st.Page("pages/1_Prompt_Benchmark.py", title="Prompt Benchmark", icon="📊")
+
+navigation = st.navigation(
+    [home_page, rubric_page, review_page, calibration_page, benchmark_page],
+    position="sidebar",
+)
+navigation.run()
