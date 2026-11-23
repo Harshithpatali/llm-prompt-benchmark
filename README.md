@@ -26,6 +26,16 @@ Run a live benchmark with: python -m experiments.run_experiment
 
 Live benchmarking requires provider credentials and makes external API calls.
 
+## Run the 200-sample benchmark on GitHub Actions
+
+1. In repository Settings → Secrets and variables → Actions, add `GROQ_API_KEY` (or `OPENROUTER_API_KEY` if using OpenRouter). Never commit provider keys or paste them into source files.
+2. Open Actions → **200-sample LLM prompt benchmark** → Run workflow.
+3. Keep sample size at `200` and select the provider matching the configured secret.
+4. The workflow evaluates all five strategies on the same 200 held-out products (up to 1,000 model requests), creates a Markdown comparison report and raw JSON artifact, then commits both directly to `main`.
+
+Workflow results include exact match, attribute-level and micro/macro F1, JSON validity, latency, token counts, request failures, paired bootstrap confidence intervals and paired sign-test p-values. Review failure rates before interpreting comparisons. API usage may incur provider charges or be subject to rate limits.
+
+
 ## API
 Start with: uvicorn backend.main:app --reload --port 8000
 
