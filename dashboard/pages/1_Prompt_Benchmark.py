@@ -8,10 +8,16 @@ import requests
 import streamlit as st
 
 st.set_page_config(page_title="Prompt Benchmark", page_icon="📊", layout="wide")
+import sys
+from pathlib import Path
+DASHBOARD_DIR = Path(__file__).resolve().parents[1]
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.insert(0, str(DASHBOARD_DIR))
+from ui import apply_theme, page_header
+apply_theme()
 API_URL = "https://llm-prompt-benchmark.onrender.com"
 
-st.title("📊 Prompt Benchmark")
-st.caption("Compare structured extraction strategies, inspect experiment artifacts and run a live product-attribute extraction.")
+page_header("Experiment analysis", "Prompt Benchmark", "Compare structured extraction strategies, inspect experiment artifacts and run a live product-attribute extraction.")
 
 results_dir = Path("results")
 result_files = sorted(results_dir.glob("*.json"), reverse=True) if results_dir.exists() else []
