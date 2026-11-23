@@ -5,7 +5,7 @@ import csv
 import io
 from pathlib import Path
 
-from backend.rubric_qa import HEADERS, OVERALL_ROWS, validate_csv
+from backend.rubric_qa import ATOMIC_CATEGORIES, HEADERS, OVERALL_ROWS, validate_csv
 
 GUIDE_PATH = Path(__file__).resolve().parents[1] / "docs" / "RUBRIC_GENERATION_GUIDE.md"
 
@@ -18,7 +18,7 @@ def build_generation_prompt(scenario: str, guide: str | None = None) -> str:
     """
     if not scenario or not scenario.strip():
         raise ValueError("Scenario prompt cannot be empty")
-    categories = sorted(__import__("backend.rubric_qa", fromlist=["ATOMIC_CATEGORIES"]).ATOMIC_CATEGORIES)
+    categories = sorted(ATOMIC_CATEGORIES)
     category_text = "\\n".join(f"- {category}" for category in categories)
     return f"""You design rigorous evaluation rubrics for assistant responses.
 
