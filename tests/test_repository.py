@@ -18,6 +18,12 @@ class FakeCursor:
         self.batch = (query, rows)
         return self
 
+    def fetchone(self):
+        return self.rows[0] if self.rows else None
+
+    def fetchall(self):
+        return self.rows
+
 
 class FakeConnection:
     def __init__(self):
