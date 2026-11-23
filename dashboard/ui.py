@@ -5,6 +5,47 @@ import streamlit as st
 CSS = """
 <style>
 :root { color-scheme: dark; }
+html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"],
+[data-testid="stMain"], [data-testid="stSidebar"], [data-testid="stVerticalBlock"] {
+  color: #e8eefb !important;
+}
+[data-testid="stAppViewContainer"] *, [data-testid="stSidebar"] * {
+  color: inherit;
+}
+h1, h2, h3, h4, h5, h6,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stCaptionContainer"], label,
+[data-testid="stWidgetLabel"], [data-testid="stHeader"] {
+  color: #e8eefb !important;
+}
+[data-testid="stSidebar"] a,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a,
+[data-testid="stSidebar"] [data-testid="stPageLink"] span {
+  color: #dce7fa !important;
+}
+[data-testid="stSidebar"] [aria-current="page"] {
+  background: #263957 !important;
+  border-radius: 8px;
+}
+.stTextInput input, .stTextArea textarea, .stNumberInput input,
+[data-baseweb="select"] input, [data-baseweb="select"] div {
+  color: #f2f6ff !important;
+}
+.stTextInput input::placeholder, .stTextArea textarea::placeholder {
+  color: #9aabc4 !important;
+  opacity: 1;
+}
+[data-testid="stAlert"] p, [data-testid="stAlert"] span {
+  color: #17243a !important;
+}
+[data-testid="stAlert"] {
+  background: #dceaff !important;
+}
+.stButton button, .stDownloadButton button {
+  color: #f5f8ff !important;
+}
+
 .block-container { max-width: 1280px; padding: 1.7rem 2rem 4rem; }
 [data-testid="stAppViewContainer"] { background: #0b1020; }
 [data-testid="stHeader"] { background: rgba(11,16,32,.82); }
@@ -18,7 +59,7 @@ p, label, [data-testid="stMarkdownContainer"] { line-height: 1.58; }
 [data-testid="stVerticalBlockBorderWrapper"] { background: rgba(20,31,53,.62); border: 1px solid #293852; border-radius: 18px; }
 div[data-testid="stMetric"] { background: #121e33; border: 1px solid #2a3a55; border-radius: 15px; padding: 15px 17px; }
 div[data-testid="stMetricLabel"] { color: #aab9d0; }
-div[data-testid="stMetricValue"] { font-weight: 750; }
+div[data-testid="stMetricValue"] { font-weight: 750; color: #f5f8ff !important; }
 .stButton > button, .stDownloadButton > button, [data-testid="stFormSubmitButton"] > button { border-radius: 11px; min-height: 2.8rem; font-weight: 650; border: 1px solid #3b4d6b; }
 .stButton > button[kind="primary"], [data-testid="stFormSubmitButton"] > button[kind="primary"] { background: #5577e8; border-color: #5577e8; color: white; }
 .stTextInput input, .stTextArea textarea, .stSelectbox [data-baseweb="select"], .stNumberInput input { border-radius: 10px; background: #111c30; }
@@ -27,7 +68,7 @@ div[data-testid="stMetricValue"] { font-weight: 750; }
 [data-testid="stExpander"] { border: 1px solid #293852; border-radius: 13px; overflow: hidden; }
 [data-testid="stDataFrame"] { border: 1px solid #293852; border-radius: 12px; overflow: hidden; }
 .small-muted { color: #9aabc4; font-size: .9rem; }
-.hero { padding: 1.25rem 1.4rem; border: 1px solid #2b3b58; border-radius: 20px; background: linear-gradient(120deg, #142544, #111a2e 68%, #17213a); margin: .4rem 0 1.3rem; }
+.hero { color: #e8eefb !important; padding: 1.25rem 1.4rem; border: 1px solid #2b3b58; border-radius: 20px; background: linear-gradient(120deg, #142544, #111a2e 68%, #17213a); margin: .4rem 0 1.3rem; }
 .hero-kicker { color: #9eb8ff; font-size: .76rem; font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
 .hero-copy { color: #b7c5dc; margin-top: .35rem; max-width: 850px; }
 .eyebrow { color: #9eb8ff; font-size: .76rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
