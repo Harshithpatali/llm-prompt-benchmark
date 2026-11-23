@@ -23,7 +23,7 @@ st.divider()
 st.subheader("Evaluation workspaces")
 st.write("Choose a workspace. Existing prompt benchmark datasets and experiment results are preserved.")
 
-left, right = st.columns(2, gap="large")
+left, right, third = st.columns(3, gap="large")
 with left:
     with st.container(border=True):
         st.markdown("### 🧪 Human Quality Review")
@@ -34,6 +34,11 @@ with right:
         st.markdown("### 📊 Prompt Benchmark")
         st.write("Compare prompt strategies, inspect extraction metrics, explore raw model outputs, and run live attribute extraction.")
         st.page_link("dashboard/pages/1_Prompt_Benchmark.py", label="Open prompt benchmark", icon="📊", use_container_width=True)
+with third:
+    with st.container(border=True):
+        st.markdown("### 🧩 Rubric Studio")
+        st.write("Generate atomic Pass/Fail rubrics from scenario prompts and run framework QA before export.")
+        st.page_link("dashboard/pages/3_Rubric_Studio.py", label="Open Rubric Studio", icon="🧩", use_container_width=True)
 
 st.divider()
 st.subheader("Platform capabilities")
