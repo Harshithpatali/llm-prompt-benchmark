@@ -176,7 +176,7 @@ def generate_rubric(req: RubricGenerateRequest):
             model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
-            max_tokens=12000,
+            max_tokens=4000,
         )
         raw = response.choices[0].message.content or ""
         csv_text, qa = parse_and_validate(raw)
