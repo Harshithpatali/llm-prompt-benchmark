@@ -1,34 +1,69 @@
 # LLM Quality Intelligence Platform
 
-Prompt benchmarking, model evaluation, and quality reliability analysis in one reproducible platform.
+**Prompt benchmarking, model evaluation, and quality reliability analysis in one reproducible platform.**
 
 This repository consolidates the structured prompt-benchmarking project with the evaluation, calibration, and human-review capabilities from [LLM Quality Intelligence Platform](https://github.com/Harshithpatali/llm-quality-intelligence-platform).
 
-## Existing research assets
+The prompt benchmark remains a first-class research suite. The broader platform adds task-specific quality evaluation, human review, judge validation, calibration, experiment history, and operational monitoring.
 
-- `data/final_clean_amazon.jsonl`: structured product attribute extraction benchmark.
+## Existing datasets
+
+- `data/final_clean_amazon.jsonl`: structured e-commerce product-attribute extraction data.
+- `data/benchmark.jsonl`: 60 general response-quality cases across 12 categories.
+- `data/seller_support_tasks.json`: 16 seller-support scenarios across six categories.
+
+See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limitations. The general and seller-support datasets are authored starter scenarios, not externally validated gold standards or real customer records.
+
+## Current capabilities
+
+### Prompt benchmarking
+
 - Five prompt strategies: zero-shot, few-shot, chain-of-thought instruction, structured JSON, and role-based.
-- Extraction metrics: exact match, attribute precision/recall/F1, micro/macro F1, JSON validity, coverage, missing attributes, lexical unsupported-value rate, latency, token usage, and request failures.
+- Leakage-aware data splitting: demonstrations are sampled only from training rows; all strategies share the same untouched holdout.
+- Structured extraction metrics: exact match, attribute precision/recall/F1, micro/macro F1, JSON validity, missing attributes, coverage, lexical unsupported-value rate, latency, token usage, and request failures.
 - Paired bootstrap confidence intervals and paired sign tests.
-- Saved raw results and Markdown experiment reports.
-- FastAPI extraction API, Streamlit dashboard, and GitHub Actions workflows.
+- Raw JSON results and Markdown research reports.
 
-The consolidated platform will also incorporate:
-- `data/benchmark.jsonl`: 60 general response-quality starter cases from the companion repository.
-- `data/seller_support_tasks.json`: 16 seller-support review scenarios from the companion repository.
-- Versioned rubrics, judge validation, human annotations, adjudication, reviewer agreement, calibration, evaluation traces, review queues, and audit history.
+### Quality and reliability analysis
 
-These additional capabilities are the integration target; they are not all implemented or wired into this repository yet.
+- Validated loaders for the general benchmark and seller-support scenarios.
+- Reference-overlap diagnostics for general responses, explicitly labelled as lexical heuristics.
+- Judge threshold calibration using validation labels and frozen evaluation on an untouched holdout.
+- Judge-versus-human agreement, confusion matrices, Cohen's kappa, class-level metrics, and bootstrap accuracy intervals.
+- Annotation summaries, inter-reviewer agreement, and deterministic risk-aware audit sampling.
 
-## Quality evaluation principles
+### Application foundation
 
-Keep task-specific metrics separate. Product attribute F1, customer-support policy scores, and RAG faithfulness are not interchangeable. Store metric definitions, scales, dataset versions, prompt versions, and evaluator versions with every run.
+- FastAPI extraction API.
+- Streamlit experiment dashboard.
+- GitHub Actions offline test and manual live-benchmark workflows.
 
-The unsupported-value metric in the extraction benchmark is a lexical evidence heuristic, not semantic hallucination detection. LLM-as-judge scores remain supplementary until validated against independent human annotations. Authored or synthetic scenarios are not real customer data or externally validated gold standards.
+## Important measurement limitations
+
+- The general reference-overlap evaluator is a **lexical diagnostic**, not semantic correctness, factuality, relevance, groundedness, or safety evaluation.
+- The e-commerce unsupported-value metric is also a lexical evidence heuristic, not semantic hallucination detection.
+- LLM-as-judge scores remain supplementary until validated against independently collected human annotations.
+- Human labels are an operational reference, not infallible ground truth.
+- Bootstrap intervals quantify sampling uncertainty for the evaluated sample; they do not remove dataset bias, label errors, or model/provider drift.
+- Keep task-specific metrics separate. Product extraction F1, support-policy rubric scores, and RAG faithfulness are not interchangeable.
+- Cost reporting requires a maintained provider/model price table and must be omitted when prices are unknown.
+
+## Planned integration
+
+The following remain implementation work:
+
+- Unified benchmark execution across the three dataset families.
+- Versioned rubrics and task-specific scoring for relevance, correctness, completeness, instruction following, groundedness, and policy compliance.
+- Human annotation UI, task assignment, submissions, and adjudication.
+- Evaluation run/trace persistence using PostgreSQL (Neon is the intended target).
+- Unified FastAPI endpoints and Streamlit quality-intelligence pages.
+- RAG evaluation when retrieval contexts and evidence references are available.
+
+See [Architecture](docs/ARCHITECTURE.md) and [Implementation Roadmap](docs/IMPLEMENTATION_ROADMAP.md). The companion repository remains a reference; this repository is the consolidated target.
 
 ## Local setup
 
-Use Python 3.11 or compatible.
+Use Python 3.11 or a compatible version.
 
 ```bash
 python -m venv .venv
@@ -37,7 +72,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Set provider credentials in a local `.env` file. Never commit API keys.
+Create a local `.env` file (never commit secrets):
 
 ```env
 PROVIDER=groq
@@ -59,7 +94,7 @@ For OpenRouter, configure `OPENROUTER_API_KEY` and set `PROVIDER=openrouter`.
 pytest -q
 ```
 
-### Run the prompt benchmark
+### Run the existing e-commerce prompt benchmark
 
 Live runs call an external model API and may incur provider charges or rate limits.
 
@@ -77,13 +112,9 @@ streamlit run dashboard/app.py
 
 Current API routes: `GET /health`, `GET /strategies`, `POST /extract`, `GET /results`, and `GET /results/{filename}`.
 
-## Architecture and roadmap
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md). Neon PostgreSQL is the intended persistence target. The old Supabase-specific data-access code must be replaced with a native PostgreSQL repository layer; do not assume changing a connection URL is sufficient.
-
 ## Reproducibility
 
-Record provider, exact model, dataset version, split seed and IDs, prompt version, evaluator/rubric version, generation settings, and timestamp. Do not tune on the final holdout. Review API failures and effective sample size before interpreting results.
+Record provider, exact model, dataset version/hash, split seed and IDs, prompt version, evaluator/rubric version, generation settings, and timestamp. Do not tune on the final holdout. Review API failures and effective sample size before interpreting results.
 
 ## Security
 

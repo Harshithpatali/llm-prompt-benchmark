@@ -9,6 +9,14 @@ The consolidated repository combines two complementary workflows:
 
 The prompt benchmark remains a task-specific research suite. It is not replaced by one generic score.
 
+## Datasets
+
+- `data/final_clean_amazon.jsonl`: structured extraction dataset with six target attributes.
+- `data/benchmark.jsonl`: 60 general-response challenge cases.
+- `data/seller_support_tasks.json`: 16 policy and customer-support scenarios.
+
+Dataset loaders validate schemas and unique IDs. Provenance and limitations are recorded in `data/DATASET_MANIFEST.md`.
+
 ## Logical architecture
 
 ```text
@@ -27,23 +35,24 @@ Provider adapters --> prompt / model execution
           v
 Task-specific evaluators
   |-- structured extraction metrics
-  |-- rubric-based quality dimensions
-  |-- groundedness / evidence checks
+  |-- reference-overlap diagnostics (lexical only)
+  |-- rubric-based quality dimensions (planned)
+  |-- groundedness / evidence checks (planned)
   `-- judge validation and calibration
           |
-          +------> Human annotation and adjudication
+          +------> Human annotation and adjudication (workflow planned)
           |
           v
 Experiment and trace records
           |
           v
-PostgreSQL persistence (Neon target)
+PostgreSQL persistence (Neon target; planned)
           |
           v
 FastAPI service + Streamlit quality dashboard
 ```
 
-## Reuse from the prompt-benchmark repository
+## Existing components to preserve
 
 - `prompts/prompt_templates.py`: prompt strategy registry.
 - `utils/data_loader.py`: e-commerce dataset validation and leakage-aware splitting.
@@ -52,17 +61,22 @@ FastAPI service + Streamlit quality dashboard
 - `experiments/run_experiment.py`: reproducible extraction experiment.
 - `backend/main.py`: current extraction API baseline.
 - `dashboard/app.py`: current Streamlit dashboard baseline.
+- `backend/calibration.py`: reviewer/judge reliability and validation/holdout threshold calibration.
+- `backend/judge_validation.py`: judge-vs-human validation and bootstrap accuracy intervals.
+- `backend/ops_metrics.py`: annotation summaries, reviewer agreement, and risk-aware audit sampling.
+- `backend/evaluator.py`: lexical reference-overlap diagnostics only.
+- `backend/quality_datasets.py`: validated loaders for the two additional datasets.
 - Existing `data/`, `results/`, and `reports/` artifacts must be preserved.
 
-## Adapt from the companion quality-intelligence repository
+## Components still to integrate
 
-- `backend/calibration.py`: reviewer/judge reliability analysis and validation/holdout threshold calibration.
-- `backend/judge_validation.py`: judge-vs-human validation and bootstrap accuracy intervals.
-- `backend/ops_metrics.py`: annotation operations and quality metrics.
-- `backend/rubric_generator.py`: rubric generation workflow.
-- `backend/providers.py`: provider abstraction, reconciled with existing benchmark provider calls.
-- `backend/evaluator.py` and `backend/benchmark.py`: general benchmark evaluation, separated from extraction-specific metrics.
-- Existing SQL schemas and API contracts are references only. Do not copy Supabase-specific persistence code unchanged.
+- General benchmark execution and task-specific rubric scoring.
+- Rubric generation and versioning.
+- Human annotation task assignment, submissions, and adjudication.
+- Evaluation traces, review queues, audit history, and operational persistence.
+- Provider abstraction reconciled with the current prompt-benchmark API client.
+
+The companion quality-intelligence source contains Supabase-specific data access and API orchestration. Treat its schemas and contracts as references; do not copy its Supabase persistence code unchanged.
 
 ## Run-level data contract
 

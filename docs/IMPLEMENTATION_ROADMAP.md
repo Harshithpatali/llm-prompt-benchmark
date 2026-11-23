@@ -7,8 +7,10 @@ This roadmap separates existing repository capabilities from work still required
 - [x] Preserve the existing Amazon JSONL dataset and saved experiment artifacts.
 - [x] Retain the prompt registry, experiment runner, extraction metrics, API, dashboard, and CI.
 - [x] Document the combined product scope and architecture.
-- [ ] Add a dataset manifest with provenance, license, version/hash, row count, schema, and limitations.
-- [ ] Record the current offline test baseline.
+- [x] Copy and validate the 60-case general benchmark and 16 seller-support scenarios.
+- [x] Add validated loaders, lexical reference-overlap diagnostics, and a dataset manifest.
+- [ ] Add a reproducible Amazon dataset manifest with a verified source hash and upstream provenance.
+- [x] Integrate judge calibration, judge validation, and annotation/reviewer metrics with tests.
 
 ## Stage 1 — Normalize the application structure
 
@@ -20,20 +22,23 @@ This roadmap separates existing repository capabilities from work still required
 
 ## Stage 2 — Integrate quality evaluation
 
-- [ ] Add the 60-case general benchmark as a versioned dataset.
-- [ ] Add seller-support scenarios as a separate policy/groundedness evaluation suite.
-- [ ] Add a general benchmark runner without treating lexical overlap as semantic correctness.
-- [ ] Add versioned rubrics and transparent score details.
+- [x] Add the 60-case general benchmark as a versioned starter dataset.
+- [x] Add seller-support scenarios as a separate policy/groundedness challenge dataset.
+- [x] Add a validated loader for both datasets.
+- [x] Add lexical reference-overlap diagnostics with explicit semantic limitations.
+- [ ] Add a general benchmark runner with provider execution and run metadata.
+- [ ] Add versioned rubrics and transparent task-specific score details.
 - [ ] Add RAG evaluation only when retrieval contexts and evidence references are available.
 
 ## Stage 3 — Human review and judge validation
 
+- [x] Add offline judge-vs-human validation and reliability-analysis modules.
+- [x] Add reviewer agreement and annotation operational metric helpers.
 - [ ] Build annotation task creation, reviewer submission, and adjudication workflows.
 - [ ] Use pseudonymous reviewer IDs; do not expose personal details in public artifacts.
-- [ ] Integrate human-human agreement and judge-vs-adjudicated analysis.
-- [ ] Calibrate judge thresholds on a validation split only.
-- [ ] Freeze thresholds and evaluate once on an untouched holdout.
-- [ ] Show class support, confusion matrices, confidence intervals, and limitations.
+- [ ] Connect collected human labels to calibration inputs through a validated data contract.
+- [x] Implement validation-only threshold selection and frozen holdout evaluation in the offline calibration module.
+- [ ] Show class support, confusion matrices, confidence intervals, and limitations in the dashboard.
 
 ## Stage 4 — Persistence with Neon PostgreSQL
 
