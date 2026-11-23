@@ -191,3 +191,27 @@ Rubric Studio now supports a versioned lifecycle backed by Neon:
 Migration: `migrations/002_rubric_lifecycle.sql`. The migration adds rubric source/version metadata and the `rubric_evaluations` and `rubric_criterion_scores` tables.
 
 **Evaluation integrity:** LLM judge scores are model-generated estimates, not ground truth. Inspect evidence and rationale and route consequential decisions through human review. The evaluator rejects missing, duplicate or unknown criterion IDs and does not allow draft rubrics to be used for scoring.
+
+## Human adjudication and judge calibration
+
+The rubric evaluation workflow supports independent expert labels and a final adjudication per criterion:
+
+- Create a human review task from a saved judge evaluation.
+- Submit Pass / Fail / Not Applicable labels with evidence, rationale and confidence. An annotator can revise their own label.
+- Record an adjudicated final verdict for a criterion. Adjudicated labels take precedence over human-majority labels.
+- Calibration excludes tied human votes when no adjudication resolves the tie.
+- Compare the judge against adjudicated or non-tied human-majority labels using three-class exact agreement, Cohen's kappa, and Pass-class precision, recall and F1.
+- Report reliability per criterion. Low agreement / low kappa criteria are flagged; small samples are explicitly marked insufficient rather than reliable.
+- Persist calibration reports in `judge_calibration_runs`.
+
+### Human review and calibration API
+
+- `POST /rubrics/evaluations/{evaluation_id}/review-task` — create a human review task.
+- `GET /rubrics/review-tasks` — list rubric review tasks.
+- `POST /rubrics/human-annotations` — submit an expert criterion label.
+- `POST /rubrics/adjudications` — record a final adjudicated criterion verdict.
+- `POST /rubrics/calibration` — calculate and optionally persist agreement and reliability metrics.
+
+All review and calibration endpoints require `X-Review-API-Key`. The Judge Calibration Streamlit page provides the review, adjudication and calibration interface.
+
+**Calibration caveat:** Agreement metrics are only meaningful when expert labels are independently produced and evidence-backed. Human-majority labels are provisional reference labels; adjudicated labels take precedence. This is not a substitute for a representative, held-out judge validation set.
