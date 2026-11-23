@@ -28,12 +28,12 @@ with left:
     with st.container(border=True):
         st.markdown("### 🧪 Human Quality Review")
         st.write("Inspect candidate answers against their context, record evidence-backed assessments, and review submitted annotations.")
-        st.page_link("pages/2_Quality_Review.py", label="Open human review", icon="🧪", use_container_width=True)
+        st.page_link("dashboard/pages/2_Quality_Review.py", label="Open human review", icon="🧪", use_container_width=True)
 with right:
     with st.container(border=True):
         st.markdown("### 📊 Prompt Benchmark")
         st.write("Compare prompt strategies, inspect extraction metrics, explore raw model outputs, and run live attribute extraction.")
-        st.page_link("pages/1_Prompt_Benchmark.py", label="Open prompt benchmark", icon="📊", use_container_width=True)
+        st.page_link("dashboard/pages/1_Prompt_Benchmark.py", label="Open prompt benchmark", icon="📊", use_container_width=True)
 
 st.divider()
 st.subheader("Platform capabilities")
