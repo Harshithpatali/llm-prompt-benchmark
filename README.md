@@ -146,3 +146,12 @@ Keep API keys and database URLs in environment variables or deployment secrets. 
 ## License
 
 MIT
+
+## Rubric generation and QA standards
+
+The repository now includes the supplied universal rubric-generation framework and its companion QA specification:
+
+- [Universal Rubric Generation Guide](docs/RUBRIC_GENERATION_GUIDE.md) — nine parent categories, atomic binary Pass/Fail criteria, explicit-versus-implicit traceability, and the fixed 14 Overall Performance questions (O1–O14). The guide specifies a nine-column CSV output and requires all fields to be quoted.
+- [Rubric QA Specification](docs/RUBRIC_QA_SPEC.md) — validation rules for category names, immutable O1–O14 wording, sequential component IDs, CSV quoting/escaping, explicit/implicit alignment, and coverage checks.
+
+These documents preserve the supplied source specifications. They are evaluation methodology references; the rubric-generation and QA interfaces are not yet represented as completed product features merely by adding these documents.
