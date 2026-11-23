@@ -1,21 +1,22 @@
-"""FastAPI service for prompt extraction and LLM quality run history."""
+"""FastAPI service for prompt extraction, experiment history and human review."""
 import json
 import os
 from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query
 from openai import OpenAI
+from pydantic import BaseModel, Field
 
-from prompts.prompt_templates import PROMPT_MAP
-from evaluation.metrics import safe_parse_json
 from backend import db, repository
+from backend.review_tasks import build_review_tasks, validate_annotation_submission
+from evaluation.metrics import safe_parse_json
+from prompts.prompt_templates import PROMPT_MAP
 
 load_dotenv()
-app = FastAPI(title="LLM Quality Intelligence API", version="3.0")
+app = FastAPI(title="LLM Quality Intelligence API", version="3.1")
 RESULTS_DIR = Path(os.getenv("RESULTS_DIR", "results")).resolve()
 
 
@@ -58,9 +59,31 @@ class QualityResultCreate(BaseModel):
     error_message: str | None = None
 
 
+class AnnotationDimensions(BaseModel):
+    relevance: str
+    correctness: str
+    completeness: str
+
+
+class AnnotationSubmission(BaseModel):
+    annotator_id: str = Field(min_length=1, max_length=120)
+    dimensions: AnnotationDimensions
+    overall_label: str
+    evidence: str = Field(min_length=8, max_length=4000)
+    confidence: int = Field(ge=1, le=5)
+    handling_seconds: int = Field(default=0, ge=0)
+    escalated: bool | None = None
+    defect_category: str = Field(default="none", min_length=1, max_length=120)
+    is_audit: bool = False
+
+
 def _database_http_error(exc: Exception) -> HTTPException:
     if isinstance(exc, db.DatabaseConfigurationError):
         return HTTPException(503, "Database is not configured")
+    if isinstance(exc, LookupError):
+        return HTTPException(404, str(exc))
+    if isinstance(exc, ValueError):
+        return HTTPException(409, str(exc))
     return HTTPException(503, "Database is unavailable or the required migration is not applied")
 
 
@@ -105,10 +128,8 @@ def extract(req: ExtractRequest):
     prompt = PROMPT_MAP[req.strategy](req.item_name, req.bullet_points)
     try:
         response = _client(req.provider).chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            max_tokens=512,
+            model=model, messages=[{"role": "user", "content": prompt}],
+            temperature=0, max_tokens=512,
         )
         raw = response.choices[0].message.content or ""
     except Exception as exc:
@@ -116,21 +137,16 @@ def extract(req: ExtractRequest):
     prediction = safe_parse_json(raw)
     if not prediction:
         raise HTTPException(502, "Provider returned invalid JSON")
-    return ExtractResponse(
-        strategy=req.strategy, provider=req.provider, model=model,
-        prediction=prediction, raw_output=raw,
-    )
+    return ExtractResponse(strategy=req.strategy, provider=req.provider, model=model,
+                            prediction=prediction, raw_output=raw)
 
 
 @app.post("/quality/runs", status_code=201)
 def create_quality_run(req: QualityRunCreate):
     try:
         return repository.create_run(
-            run_type=req.run_type,
-            provider=req.provider,
-            model_name=req.model_name,
-            configuration=req.configuration,
-            metadata=req.metadata,
+            run_type=req.run_type, provider=req.provider, model_name=req.model_name,
+            configuration=req.configuration, metadata=req.metadata,
         )
     except Exception as exc:
         raise _database_http_error(exc) from exc
@@ -141,19 +157,15 @@ def add_quality_results(run_id: UUID, results: list[QualityResultCreate]):
     if len(results) > 500:
         raise HTTPException(413, "A single request is limited to 500 results")
     try:
-        inserted = repository.add_results(
-            run_id, [item.model_dump() for item in results]
-        )
+        inserted = repository.add_results(run_id, [item.model_dump() for item in results])
         return {"run_id": str(run_id), "submitted": len(results), "processed": inserted}
     except Exception as exc:
         raise _database_http_error(exc) from exc
 
 
 @app.get("/quality/runs")
-def list_quality_runs(
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0, le=100000),
-):
+def list_quality_runs(limit: int = Query(default=20, ge=1, le=100),
+                      offset: int = Query(default=0, ge=0, le=100000)):
     try:
         return {"runs": repository.list_runs(limit=limit, offset=offset)}
     except Exception as exc:
@@ -169,6 +181,51 @@ def get_quality_run(run_id: UUID):
     if result is None:
         raise HTTPException(404, "Evaluation run not found")
     return result
+
+
+@app.post("/quality/review-tasks/seed", status_code=201)
+def seed_review_tasks():
+    """Idempotently import the repository's 16 authored seller-support examples."""
+    try:
+        tasks = build_review_tasks()
+        inserted = repository.create_review_tasks(tasks)
+        return {"source": "seller_support_tasks", "tasks_in_source": len(tasks),
+                "inserted_or_existing": inserted}
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+
+@app.get("/quality/review-tasks")
+def list_review_tasks(
+    status: str | None = Query(default="pending", pattern="^(pending|claimed|submitted|adjudicated|cancelled)$"),
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0, le=100000),
+):
+    try:
+        return {"tasks": repository.list_review_tasks(status=status, limit=limit, offset=offset)}
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+
+@app.post("/quality/review-tasks/{task_id}/annotations", status_code=201)
+def submit_review_annotation(task_id: UUID, submission: AnnotationSubmission):
+    task = {"review_task_id": str(task_id)}
+    try:
+        normalized = validate_annotation_submission(
+            task, submission.model_dump(exclude_none=True)
+        )
+        return repository.submit_annotation(task_id, normalized)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+
+@app.get("/quality/annotations")
+def list_quality_annotations(limit: int = Query(default=100, ge=1, le=500),
+                             offset: int = Query(default=0, ge=0, le=100000)):
+    try:
+        return {"annotations": repository.list_annotations(limit=limit, offset=offset)}
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
 
 
 @app.get("/results")

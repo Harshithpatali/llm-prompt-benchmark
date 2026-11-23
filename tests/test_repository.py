@@ -27,7 +27,7 @@ class FakeCursor:
 
 class FakeConnection:
     def __init__(self):
-        self.cursor = FakeCursor([{"run_id": "abc", "status": "pending"}])
+        self.cursor = FakeCursor([{"run_id": "abc", "status": "pending", "annotation_id": "ann-1"}])
 
     def execute(self, query, params):
         return self.cursor.execute(query, params)
@@ -36,7 +36,7 @@ class FakeConnection:
         return self.cursor.executemany(query, rows)
 
 
-def test_create_run_uses_bound_parameters(monkeypatch):
+def _patch(monkeypatch):
     fake = FakeConnection()
 
     @contextmanager
@@ -44,25 +44,20 @@ def test_create_run_uses_bound_parameters(monkeypatch):
         yield fake
 
     monkeypatch.setattr(repository, "connection", fake_connection)
-    result = repository.create_run(
-        run_type="general_quality",
-        provider="mock",
-        model_name="mock-model",
-        configuration={"seed": 42},
-    )
+    return fake
+
+
+def test_create_run_uses_bound_parameters(monkeypatch):
+    fake = _patch(monkeypatch)
+    result = repository.create_run(run_type="general_quality", provider="mock",
+                                   model_name="mock-model", configuration={"seed": 42})
     assert result["status"] == "pending"
     assert "%s" in fake.cursor.executed[0]
     assert "mock-model" in fake.cursor.executed[1]
 
 
 def test_add_results_uses_parameterized_batch_and_handles_empty(monkeypatch):
-    fake = FakeConnection()
-
-    @contextmanager
-    def fake_connection():
-        yield fake
-
-    monkeypatch.setattr(repository, "connection", fake_connection)
+    fake = _patch(monkeypatch)
     assert repository.add_results(uuid4(), []) == 0
     count = repository.add_results(uuid4(), [{
         "case_id": "CASE-1", "category": "reasoning", "prompt": "Question",
@@ -71,3 +66,27 @@ def test_add_results_uses_parameterized_batch_and_handles_empty(monkeypatch):
     assert count == 1
     assert "ON CONFLICT" in fake.cursor.batch[0]
     assert len(fake.cursor.batch[1]) == 1
+
+
+def test_create_review_tasks_is_idempotent_insert(monkeypatch):
+    fake = _patch(monkeypatch)
+    count = repository.create_review_tasks([{
+        "review_task_id": "SELL-001", "source_dataset": "seller_support_tasks",
+        "category": "returns", "difficulty": "easy", "query": "Q",
+        "context": "C", "candidate_response": "R", "review_guidance": "G",
+    }])
+    assert count == 1
+    assert "ON CONFLICT (task_key) DO NOTHING" in fake.cursor.batch[0]
+
+
+def test_submit_annotation_updates_task_and_audit_log(monkeypatch):
+    fake = _patch(monkeypatch)
+    result = repository.submit_annotation(uuid4(), {
+        "annotator_id": "reviewer-1", "relevance": "pass", "correctness": "pass",
+        "completeness": "minor_issue", "overall_label": "revise",
+        "evidence": "Evidence long enough.", "confidence": 4,
+        "handling_seconds": 35, "escalated": False,
+        "defect_category": "completeness", "is_audit": False,
+    })
+    assert result["annotation_id"] == "ann-1"
+    assert "FOR UPDATE" in fake.cursor.executed[0]
