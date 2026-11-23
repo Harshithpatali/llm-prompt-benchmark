@@ -13,6 +13,8 @@ from pydantic import BaseModel, Field
 
 from backend import db, repository
 from backend.review_tasks import build_review_tasks, validate_annotation_submission
+from backend.rubric_generator import build_generation_prompt, normalize_csv
+from backend.rubric_qa import validate_csv
 from evaluation.metrics import safe_parse_json
 from prompts.prompt_templates import PROMPT_MAP
 
@@ -58,6 +60,12 @@ class QualityResultCreate(BaseModel):
     metrics: dict[str, Any] = Field(default_factory=dict)
     error_type: str | None = None
     error_message: str | None = None
+
+
+class RubricGenerateRequest(BaseModel):
+    scenario: str = Field(min_length=30, max_length=30000)
+    provider: str = Field(default="groq", pattern="^(groq|openrouter)$")
+    model: str | None = Field(default=None, max_length=200)
 
 
 class AnnotationDimensions(BaseModel):
@@ -108,6 +116,37 @@ def _client(provider: str):
     if not os.getenv(key):
         raise HTTPException(503, key + " is not configured")
     return OpenAI(api_key=os.getenv(key), base_url=base)
+
+
+@app.post("/rubrics/generate")
+def generate_rubric(req: RubricGenerateRequest):
+    """Generate a rubric from the checked-in framework and return deterministic QA."""
+    prompt = build_generation_prompt(req.scenario)
+    model = req.model or os.getenv("MODEL_NAME", "openai/gpt-oss-20b")
+    try:
+        response = _client(req.provider).chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            max_tokens=12000,
+        )
+        raw = response.choices[0].message.content or ""
+        csv_text = normalize_csv(raw)
+        qa = validate_csv(csv_text)
+        return {"provider": req.provider, "model": model, "csv": csv_text, "qa": qa}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(502, "Rubric generation failed: " + type(exc).__name__) from exc
+
+
+@app.post("/rubrics/validate")
+def validate_rubric(payload: dict[str, str]):
+    """Validate a rubric CSV without calling an LLM."""
+    csv_text = payload.get("csv", "")
+    if not csv_text or len(csv_text) > 5_000_000:
+        raise HTTPException(400, "CSV is required and must be at most 5 MB")
+    return validate_csv(csv_text)
 
 
 @app.get("/health")
