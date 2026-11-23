@@ -31,6 +31,17 @@ if result_files and selected_file != "No results found":
     with open(results_dir / selected_file, encoding="utf-8") as f:
         data = json.load(f)
 
+    # New benchmark artifacts are metadata/results objects; retain legacy list support.
+    if isinstance(data, dict):
+        metadata = data.get('metadata', {})
+        if metadata:
+            st.caption(f"Model: {metadata.get('model', 'unknown')} | Provider: {metadata.get('provider', 'unknown')} | Test rows: {len(metadata.get('test_ids', []))}")
+        comparisons = data.get('paired_comparisons_vs_zero_shot', {})
+        if comparisons:
+            with st.expander('Paired comparisons vs zero-shot'):
+                st.json(comparisons)
+        data = data.get('results', [])
+
     st.subheader("Strategy Comparison")
 
     metrics_data = []
