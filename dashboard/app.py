@@ -13,28 +13,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-st.markdown("""
-<style>
-:root { color-scheme: dark; }
-.block-container { max-width: 1180px; padding-top: 1.5rem; padding-bottom: 3rem; }
-[data-testid="stSidebar"] { border-right: 1px solid rgba(128,128,128,.18); }
-h1 { letter-spacing: -.035em; }
-h2, h3 { letter-spacing: -.02em; }
-div[data-testid="stMetric"] { background: rgba(128,128,128,.08); border: 1px solid rgba(128,128,128,.16); padding: 14px 16px; border-radius: 14px; }
-div[data-testid="stVerticalBlockBorderWrapper"] { border-radius: 16px; }
-.stButton > button, .stDownloadButton > button { border-radius: 11px; min-height: 2.8rem; font-weight: 600; }
-.stTextInput input, .stTextArea textarea, .stSelectbox [data-baseweb="select"] { border-radius: 10px; }
-div[data-testid="stAlert"] { border-radius: 12px; }
-div[data-testid="stTabs"] button { font-weight: 600; }
-.small-muted { color: rgba(180,180,180,.85); font-size: .9rem; }
-@media (max-width: 700px) {
- .block-container { padding-left: 1rem; padding-right: 1rem; padding-top: .8rem; }
- h1 { font-size: 1.8rem !important; }
- h2 { font-size: 1.4rem !important; }
- div[data-testid="stMetric"] { padding: 10px; }
-}
-</style>
-""", unsafe_allow_html=True)
+
 
 DASHBOARD_DIR = Path(__file__).resolve().parent
 if str(DASHBOARD_DIR) not in sys.path:
