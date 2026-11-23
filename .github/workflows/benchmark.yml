@@ -40,7 +40,7 @@ jobs:
       - name: Run reproducible benchmark
         env:
           PROVIDER: ${{ inputs.provider }}
-          MODEL_NAME: ${{ inputs.provider == 'groq' && 'llama-3.1-8b-instant' || 'meta-llama/llama-3.1-8b-instruct' }}
+          MODEL_NAME: ${{ inputs.provider == 'groq' && 'openai/gpt-oss-20b' || 'meta-llama/llama-3.1-8b-instruct' }}
           SAMPLE_SIZE: ${{ inputs.sample_size }}
           TEST_SIZE: '0.20'
           DEMO_SIZE: '4'

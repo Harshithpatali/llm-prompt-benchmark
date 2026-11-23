@@ -12,7 +12,7 @@ from utils.data_loader import load_data, split_data, prepare_examples, gold_reco
 load_dotenv()
 PROVIDERS={"groq":("GROQ_API_KEY","https://api.groq.com/openai/v1"),
            "openrouter":("OPENROUTER_API_KEY","https://openrouter.ai/api/v1")}
-DEFAULT_MODELS={"groq":"llama-3.1-8b-instant","openrouter":"meta-llama/llama-3.1-8b-instruct"}
+DEFAULT_MODELS={"groq":"openai/gpt-oss-20b","openrouter":"meta-llama/llama-3.1-8b-instruct"}
 
 def make_client(provider):
     if provider not in PROVIDERS: raise ValueError("Unsupported provider: "+provider)
