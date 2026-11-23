@@ -96,15 +96,17 @@ def create_review_tasks(tasks: list[dict[str, Any]]) -> int:
         task["candidate_response"], task["review_guidance"],
     ) for task in tasks]
     with connection() as conn:
-        conn.executemany(
-            """
-            INSERT INTO public.annotation_tasks
-                (task_key, source_dataset, source_task_id, category, difficulty,
-                 query, context, candidate_response, review_guidance)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (task_key) DO NOTHING
-            """, rows,
-        )
+        with conn.cursor() as cursor:
+            cursor.executemany(
+                """
+                INSERT INTO public.annotation_tasks
+                    (task_key, source_dataset, source_task_id, category, difficulty,
+                     query, context, candidate_response, review_guidance)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (task_key) DO NOTHING
+                """,
+                rows,
+            )
     return len(rows)
 
 
