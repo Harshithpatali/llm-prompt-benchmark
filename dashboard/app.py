@@ -28,17 +28,22 @@ with left:
     with st.container(border=True):
         st.markdown("### 🧪 Human Quality Review")
         st.write("Inspect candidate answers against their context, record evidence-backed assessments, and review submitted annotations.")
-        st.page_link("dashboard/pages/2_Quality_Review.py", label="Open human review", icon="🧪", use_container_width=True)
+        st.page_link("pages/2_Quality_Review.py", label="Open human review", icon="🧪", use_container_width=True)
 with right:
     with st.container(border=True):
         st.markdown("### 📊 Prompt Benchmark")
         st.write("Compare prompt strategies, inspect extraction metrics, explore raw model outputs, and run live attribute extraction.")
-        st.page_link("dashboard/pages/1_Prompt_Benchmark.py", label="Open prompt benchmark", icon="📊", use_container_width=True)
+        st.page_link("pages/1_Prompt_Benchmark.py", label="Open prompt benchmark", icon="📊", use_container_width=True)
 with third:
     with st.container(border=True):
         st.markdown("### 🧩 Rubric Studio")
         st.write("Generate atomic Pass/Fail rubrics from scenario prompts and run framework QA before export.")
-        st.page_link("dashboard/pages/3_Rubric_Studio.py", label="Open Rubric Studio", icon="🧩", use_container_width=True)
+        st.page_link("pages/3_Rubric_Studio.py", label="Open Rubric Studio", icon="🧩", use_container_width=True)
+with left:
+    with st.container(border=True):
+        st.markdown("### ⚖️ Judge Calibration")
+        st.write("Collect expert criterion labels, adjudicate disagreements, and measure LLM judge reliability.")
+        st.page_link("pages/4_Judge_Calibration.py", label="Open judge calibration", icon="⚖️", use_container_width=True)
 
 st.divider()
 st.subheader("Platform capabilities")
