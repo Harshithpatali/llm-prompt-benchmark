@@ -7,11 +7,11 @@ from backend import repository
 class FakeCursor:
     def __init__(self, rows=None):
         self.rows = rows or []
-        self.executed = None
+        self.executed = []
         self.batch = None
 
     def execute(self, query, params):
-        self.executed = (query, params)
+        self.executed.append((query, params))
         return self
 
     def executemany(self, query, rows):
@@ -89,4 +89,7 @@ def test_submit_annotation_updates_task_and_audit_log(monkeypatch):
         "defect_category": "completeness", "is_audit": False,
     })
     assert result["annotation_id"] == "ann-1"
-    assert "FOR UPDATE" in fake.cursor.executed[0]
+    statements = [query for query, _ in fake.cursor.executed]
+    assert any("FOR UPDATE" in query for query in statements)
+    assert any("UPDATE public.annotation_tasks" in query for query in statements)
+    assert any("INSERT INTO public.audit_events" in query for query in statements)
