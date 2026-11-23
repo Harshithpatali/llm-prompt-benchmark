@@ -98,9 +98,9 @@ def validate_csv(content: str) -> dict[str, Any]:
     if o_ids != [f"O{i}" for i in range(1,15)]:
         issues.append(Issue("coverage","error",None,"Exactly O1 through O14 must be present in order"))
     for row in o_rows:
-        idx = int(row[0][1:])-1
-        if 1 <= idx <= 14:
-            expected = OVERALL_ROWS[idx-1]
+        overall_number = int(row[0][1:])
+        if 1 <= overall_number <= 14:
+            expected = OVERALL_ROWS[overall_number-1]
             if (row[2],row[3],row[4]) != expected[1:]:
                 issues.append(Issue("naming","error",None,f"{row[0]} immutable sub-category, component name, or evaluation question does not match the QA specification"))
     implicit = sum(1 for r in c_rows if len(r)==9 and r[5]=="Implicit")
