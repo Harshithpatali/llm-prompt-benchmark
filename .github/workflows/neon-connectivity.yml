@@ -1,0 +1,30 @@
+name: Neon database connectivity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  database-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install database driver
+        run: pip install "psycopg[binary]>=3.2,<4"
+      - name: Verify Neon connection (read-only)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python - <<'PY'
+          from backend.db import healthcheck
+          result = healthcheck()
+          print("Neon connection successful")
+          print("Database:", result["database"])
+          print("Role:", result["role"])
+          PY

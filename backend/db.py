@@ -1,7 +1,7 @@
-"""Minimal PostgreSQL connection boundary for the consolidated platform.
+"""PostgreSQL connection boundary for Neon.
 
-This module deliberately does not connect at import time. Set DATABASE_URL only
-in the runtime environment; never commit a Neon connection string.
+Connections are lazy: importing the application never opens a database session.
+All statements use parameter binding; DATABASE_URL must be supplied at runtime.
 """
 from __future__ import annotations
 
@@ -12,6 +12,10 @@ from typing import Iterator, Any
 
 class DatabaseConfigurationError(RuntimeError):
     """Raised when database configuration is missing or invalid."""
+
+
+class DatabaseUnavailableError(RuntimeError):
+    """Raised when the database driver or server is unavailable."""
 
 
 def _database_url() -> str:
@@ -25,30 +29,34 @@ def _database_url() -> str:
 
 @contextmanager
 def connection() -> Iterator[Any]:
-    """Yield a psycopg connection with TLS required and a short connect timeout."""
+    """Yield a TLS-required psycopg connection with commit/rollback semantics."""
     dsn = _database_url()
     try:
         import psycopg
         from psycopg.rows import dict_row
     except ImportError as exc:
-        raise DatabaseConfigurationError(
-            "Install the PostgreSQL driver with: pip install 'psycopg[binary]'"
+        raise DatabaseUnavailableError(
+            "PostgreSQL driver is unavailable; install psycopg[binary]"
         ) from exc
 
-    conn = psycopg.connect(
-        dsn,
-        connect_timeout=5,
-        sslmode="require",
-        row_factory=dict_row,
-    )
     try:
-        yield conn
-    finally:
-        conn.close()
+        with psycopg.connect(
+            dsn,
+            connect_timeout=8,
+            sslmode="require",
+            row_factory=dict_row,
+        ) as conn:
+            yield conn
+    except (DatabaseConfigurationError, DatabaseUnavailableError):
+        raise
+    except Exception as exc:
+        raise DatabaseUnavailableError("PostgreSQL connection or query failed") from exc
 
 
 def healthcheck() -> dict[str, Any]:
-    """Run a minimal database read; never expose the connection URL."""
+    """Run a read-only connection test; never expose the connection URL."""
     with connection() as conn:
-        row = conn.execute("SELECT current_database() AS database, 1 AS ok").fetchone()
-    return {"status": "ok", "database": row["database"]}
+        row = conn.execute(
+            "SELECT current_database() AS database, current_user AS role, 1 AS ok"
+        ).fetchone()
+    return {"status": "ok", "database": row["database"], "role": row["role"]}
