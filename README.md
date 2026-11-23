@@ -57,6 +57,13 @@ The review-task builder and submission validator are currently offline helpers. 
 - Keep task-specific metrics separate. Product extraction F1, support-policy rubric scores, and RAG faithfulness are not interchangeable.
 - Cost reporting requires a maintained provider/model price table and must be omitted when prices are unknown.
 
+## Database foundation
+
+- Initial PostgreSQL schema is checked in at `migrations/001_initial_schema.sql`.
+- `backend/db.py` provides a lazy, TLS-required psycopg connection boundary.
+- The schema was validated on a temporary Neon branch and discarded after testing; it has **not** been applied to the default branch. The existing API and dashboard are not yet database-backed.
+- See [database setup and migration instructions](database/README.md).
+
 ## Planned integration
 
 The following remain implementation work:

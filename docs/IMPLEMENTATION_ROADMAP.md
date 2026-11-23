@@ -44,9 +44,12 @@ This roadmap separates existing repository capabilities from work still required
 
 ## Stage 4 — Persistence with Neon PostgreSQL
 
-- [ ] Define native PostgreSQL migrations for the consolidated data model.
-- [ ] Add a repository/data-access layer using a PostgreSQL driver.
+- [x] Define and check in the initial PostgreSQL migration for the consolidated data model.
+- [x] Add a lazy psycopg connection boundary with TLS required.
+- [x] Syntax-test the migration on a temporary Neon branch, verify all 14 tables, and discard the temporary branch.
+- [ ] Build repository/data-access methods for runs, traces, annotations, and audit events.
 - [ ] Add transaction, retry, connection-pool, and migration tests.
+- [ ] Apply the reviewed migration to the intended Neon default branch after explicit approval.
 - [ ] Configure Neon connection secrets in deployment environments.
 - [ ] Verify write/read round trips for runs, traces, annotations, and audit events.
 - [ ] Keep JSON artifacts as reproducible exports, not as the only source of history.

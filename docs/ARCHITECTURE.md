@@ -70,6 +70,8 @@ FastAPI service + Streamlit quality dashboard
 - `backend/review_tasks.py`: seller-support review-task preparation and submission validation; no persistence.
 - `backend/evaluator.py`: lexical reference-overlap diagnostics only.
 - `backend/quality_datasets.py`: validated loaders for the two additional datasets.
+- `backend/db.py`: lazy psycopg connection boundary with TLS required; persistence methods and application integration remain future work.
+- `migrations/001_initial_schema.sql`: initial PostgreSQL schema, tested on a temporary Neon branch only.
 - Existing `data/`, `results/`, and `reports/` artifacts must be preserved.
 
 ## Components still to integrate
@@ -97,7 +99,7 @@ Keep validation and final holdout separate. Related examples must remain in one 
 
 ## Persistence target
 
-Neon PostgreSQL is the intended persistence layer. The previous quality app used Supabase-specific PostgREST calls and SQL migrations. Replace those with a PostgreSQL driver, a repository/data-access layer, and explicit migrations. Do not assume the previous Supabase SQL file is already a suitable final Neon schema.
+Neon PostgreSQL is the intended persistence layer. An initial PostgreSQL schema is checked in and was validated on a temporary Neon branch; the temporary branch was discarded, and the migration has not been applied to the default branch. A lazy psycopg connection boundary is checked in but no run/annotation persistence methods are wired yet. The previous quality app used Supabase-specific PostgREST calls and SQL migrations. Replace those with a PostgreSQL driver, a repository/data-access layer, and explicit migrations. Do not assume the previous Supabase SQL file is already a suitable final Neon schema.
 
 Candidate logical entities:
 
