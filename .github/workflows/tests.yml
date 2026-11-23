@@ -13,4 +13,5 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install numpy pandas pytest
+      - run: python -m compileall -q backend dashboard evaluation experiments prompts utils
       - run: pytest -q
