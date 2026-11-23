@@ -6,9 +6,15 @@ from backend.rubric_qa import HEADERS, OVERALL_ROWS, validate_csv
 def make_csv():
     rows = [HEADERS]
     for i in range(1, 51):
-        rows.append([f"C{i}","Content Quality & Domain Knowledge","Facts","Factual accuracy",
-                     "Does the response use supported facts?","Explicit","Use supported facts","N/A",
-                     "Fail if an unsupported factual claim is made"])
+        if i <= 10:
+            rows.append([f"C{i}","Content Quality & Domain Knowledge","Facts","Factual accuracy",
+                         "Does the response use supported facts?","Implicit","N/A",
+                         "Factual responses should be grounded in reliable evidence.",
+                         "Fail if an unsupported factual claim is made"])
+        else:
+            rows.append([f"C{i}","Content Quality & Domain Knowledge","Facts","Factual accuracy",
+                         "Does the response use supported facts?","Explicit","Use supported facts","N/A",
+                         "Fail if an unsupported factual claim is made"])
     for item in OVERALL_ROWS:
         rows.append([item[0],"Overall Performance",item[1],item[2],item[3],"N/A","N/A","N/A","N/A"])
     out=io.StringIO()
