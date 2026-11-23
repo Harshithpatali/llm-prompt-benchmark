@@ -52,8 +52,8 @@ def test_create_run_uses_bound_parameters(monkeypatch):
     result = repository.create_run(run_type="general_quality", provider="mock",
                                    model_name="mock-model", configuration={"seed": 42})
     assert result["status"] == "pending"
-    assert "%s" in fake.cursor.executed[0]
-    assert "mock-model" in fake.cursor.executed[1]
+    assert "%s" in fake.cursor.executed[0][0]
+    assert "mock-model" in fake.cursor.executed[0][1]
 
 
 def test_add_results_uses_parameterized_batch_and_handles_empty(monkeypatch):
