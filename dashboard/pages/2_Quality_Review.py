@@ -20,8 +20,12 @@ API_KEY = setting("REVIEW_API_KEY") or st.session_state.get("review_api_key", ""
 TIMEOUT = 30
 
 if not API_KEY:
-    st.error("Reviewer access is not configured. Add REVIEW_API_KEY to Streamlit Cloud Secrets.")
-    st.code('API_BASE_URL = "https://llm-prompt-benchmark.onrender.com"\nREVIEW_API_KEY = "the-same-secret-configured-on-Render"')
+    st.info("Enter the reviewer key configured on the Render API. The key is kept only in this Streamlit session.")
+    entered_key = st.text_input("Reviewer API key", type="password")
+    if entered_key.strip():
+        st.session_state["review_api_key"] = entered_key.strip()
+        st.rerun()
+    st.caption("Alternatively, configure REVIEW_API_KEY in Streamlit Cloud Secrets.")
     st.stop()
 
 def api(method: str, path: str, **kwargs):
