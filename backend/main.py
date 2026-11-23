@@ -16,6 +16,8 @@ from backend.review_tasks import build_review_tasks, validate_annotation_submiss
 from backend.rubric_generator import build_generation_prompt, parse_and_validate
 from backend import rubric_repository
 from backend.rubric_evaluator import evaluate_response
+from backend import rubric_human_review
+from backend.judge_calibration import calculate_calibration
 from backend.rubric_qa import validate_csv
 from evaluation.metrics import safe_parse_json
 from prompts.prompt_templates import PROMPT_MAP
@@ -88,6 +90,29 @@ class RubricEvaluationRequest(BaseModel):
     response: str = Field(min_length=1, max_length=30000)
     provider: str = Field(default="groq", pattern="^(groq|openrouter)$")
     model: str | None = Field(default=None, max_length=200)
+
+class RubricHumanAnnotationRequest(BaseModel):
+    evaluation_id: UUID
+    component_id: str = Field(min_length=2, max_length=20)
+    annotator_id: str = Field(min_length=1, max_length=120)
+    verdict: str = Field(pattern="^(pass|fail|not_applicable)$")
+    evidence: str = Field(min_length=3, max_length=4000)
+    rationale: str = Field(default="", max_length=3000)
+    confidence: int = Field(ge=1, le=5)
+
+class RubricAdjudicationRequest(BaseModel):
+    evaluation_id: UUID
+    component_id: str = Field(min_length=2, max_length=20)
+    adjudicator_id: str = Field(min_length=1, max_length=120)
+    verdict: str = Field(pattern="^(pass|fail|not_applicable)$")
+    evidence: str = Field(min_length=3, max_length=4000)
+    notes: str = Field(default="", max_length=4000)
+
+class RubricCalibrationRequest(BaseModel):
+    rubric_id: UUID | None = None
+    min_samples: int = Field(default=5, ge=2, le=1000)
+    reliability_threshold: float = Field(default=0.80, ge=0.0, le=1.0)
+    save_run: bool = True
 
 class AnnotationDimensions(BaseModel):
     relevance: str
@@ -239,6 +264,55 @@ def list_rubric_evaluations(rubric_id: UUID, limit: int = Query(default=20, ge=1
         return {"evaluations": rubric_repository.list_rubric_evaluations(rubric_id, limit)}
     except HTTPException:
         raise
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.post("/rubrics/evaluations/{evaluation_id}/review-task", status_code=201, dependencies=[Depends(require_review_api_key)])
+def create_rubric_review_task(evaluation_id: UUID):
+    try:
+        return rubric_human_review.create_rubric_review_task(evaluation_id)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.get("/rubrics/review-tasks", dependencies=[Depends(require_review_api_key)])
+def list_rubric_review_tasks(limit: int = Query(default=100, ge=1, le=500)):
+    try:
+        return {"tasks": rubric_human_review.list_rubric_review_tasks(limit)}
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.post("/rubrics/human-annotations", status_code=201, dependencies=[Depends(require_review_api_key)])
+def submit_rubric_human_annotation(req: RubricHumanAnnotationRequest):
+    try:
+        return rubric_human_review.submit_rubric_human_annotation(
+            evaluation_id=req.evaluation_id,component_id=req.component_id,annotator_id=req.annotator_id,
+            verdict=req.verdict,evidence=req.evidence,rationale=req.rationale,confidence=req.confidence)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.post("/rubrics/adjudications", status_code=201, dependencies=[Depends(require_review_api_key)])
+def adjudicate_rubric_criterion(req: RubricAdjudicationRequest):
+    try:
+        return rubric_human_review.adjudicate_rubric_criterion(
+            evaluation_id=req.evaluation_id,component_id=req.component_id,adjudicator_id=req.adjudicator_id,
+            verdict=req.verdict,evidence=req.evidence,notes=req.notes)
+    except Exception as exc:
+        raise _database_http_error(exc) from exc
+
+@app.post("/rubrics/calibration", dependencies=[Depends(require_review_api_key)])
+def run_rubric_calibration(req: RubricCalibrationRequest):
+    try:
+        records=rubric_human_review.get_calibration_records(req.rubric_id)
+        report=calculate_calibration(records,min_samples=req.min_samples,
+                                     reliability_threshold=req.reliability_threshold)
+        if req.save_run and report["overall"]["sample_count"]:
+            saved=rubric_human_review.save_calibration_run(
+                model="rubric-llm-judge",metrics=report,
+                thresholds=report["thresholds"],
+                metadata={"rubric_id":str(req.rubric_id) if req.rubric_id else None,
+                          "records":report["overall"]["sample_count"]})
+            report["calibration_run_id"]=str(saved["calibration_run_id"])
+        return report
     except Exception as exc:
         raise _database_http_error(exc) from exc
 
