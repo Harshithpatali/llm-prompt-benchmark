@@ -40,7 +40,7 @@ def test_missing_overall_component_fails():
 
 def test_explicit_implicit_mismatch_fails():
     rows=list(csv.reader(io.StringIO(make_csv())))
-    rows[1][6]="N/A"
+    rows[11][6]="N/A"
     out=io.StringIO()
     csv.writer(out,quoting=csv.QUOTE_ALL).writerows(rows)
     assert validate_csv(out.getvalue())["status"]=="FAIL"
