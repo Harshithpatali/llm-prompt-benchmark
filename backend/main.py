@@ -184,7 +184,17 @@ def generate_rubric(req: RubricGenerateRequest):
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(502, "Rubric generation failed: " + type(exc).__name__) from exc
+        # Capture the upstream provider's status/body in Render logs while
+        # keeping credentials and raw provider payloads out of the API response.
+        logger.exception(
+            "Rubric generation failed (provider=%s, model=%s, error_type=%s)",
+            req.provider, model, type(exc).__name__,
+        )
+        raise HTTPException(
+            502,
+            "Rubric generation failed: " + type(exc).__name__
+            + ". Check the API service logs for the upstream provider response.",
+        ) from exc
 
 
 @app.post("/rubrics/validate")
