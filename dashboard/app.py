@@ -48,7 +48,10 @@ if result_files and selected_file != "No results found":
 
     for item in data:
         row = {"strategy": item["strategy"]}
-        row.update(item.get("metrics", {}))
+        metric_values = item.get("metrics", {})
+        row.update({k: v for k, v in metric_values.items() if k != "per_attribute" and isinstance(v, (int, float))})
+        for attribute, values in metric_values.get("per_attribute", {}).items():
+            row[attribute] = values.get("exact_match", 0.0)
         metrics_data.append(row)
 
     metrics_df = pd.DataFrame(metrics_data)
@@ -132,41 +135,19 @@ if result_files and selected_file != "No results found":
         if d["strategy"] == strategy_filter
     )
 
-    raw_outputs = selected.get("raw_outputs", [])
+    raw_outputs = selected.get("raw_outputs") or selected.get("rows", [])
 
     if raw_outputs:
-
-        for i, item in enumerate(raw_outputs[:10]):
-
-            with st.expander(
-                f"Sample {i+1} | {item.get('item_id','Unknown')}"
-            ):
-
+        for i, item in enumerate(raw_outputs[:20]):
+            with st.expander(f"Sample {i+1} | {item.get('item_id', 'Unknown')}"):
                 st.write("### Prediction")
-                st.json(item.get("pred", {}))
-
-                # Add LLM Judge display
-                judge = item.get("judge")
-                if judge:
-                    st.write("### 🤖 LLM Judge")
-
-                    st.metric("Judge Score", f"{judge['score']}/5")
-
-                    st.write("**Reason**")
-                    st.write(judge["reason"])
-
-                    st.write("**Correct Attributes**")
-                    st.write(judge["correct_attributes"])
-
-                    st.write("**Incorrect Attributes**")
-                    st.write(judge["incorrect_attributes"])
-
+                st.json(item.get("prediction", item.get("pred", {})))
+                st.write("### Ground truth")
+                st.json(item.get("gold", {}))
+                st.caption(f"Latency: {item.get('latency_ms', 'n/a')} ms")
+                if item.get("error"): st.warning(item["error"])
                 st.write("### Raw LLM Output")
-                st.code(
-                    item.get("raw", ""),
-                    language="json"
-                )
-
+                st.code(item.get("raw", ""), language="json")
     else:
         st.info("No raw outputs available.")
 
@@ -192,7 +173,7 @@ with col2:
             "structured",
             "zero_shot",
             "cot",
-            "few_shot",
+            "role_based",
         ],
     )
 
@@ -212,6 +193,7 @@ if st.button("Extract Attributes"):
                     "item_name": item_name,
                     "bullet_points": bullet_points,
                     "strategy": strategy,
+                    "provider": "groq",
                 },
                 timeout=60,
             )
