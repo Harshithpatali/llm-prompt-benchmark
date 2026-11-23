@@ -14,13 +14,13 @@ def load_data(path="data/final_clean_amazon.jsonl"):
     df = pd.read_json(path, lines=True)
     input_rows = int(len(df))
     if "item_id" not in df:
-        raise ValueError("Dataset must contain item_id")
+        raise ValueError("Dataset contains missing/blank item_id column")
     if "item_name" not in df and "title" in df:
         df = df.rename(columns={"title": "item_name"})
     if "bullet_points_text" not in df:
         col = df.get("bullet_points", pd.Series([""] * len(df), index=df.index))
         df["bullet_points_text"] = col.apply(
-            lambda x: " ".join(map(str, x)) if isinstance(x, list) else str(x or "")
+            lambda x: " ".join(map(str, x)) if isinstance(x, (list, tuple)) else str(x or "")
         )
 
     df = df.copy()
@@ -35,7 +35,7 @@ def load_data(path="data/final_clean_amazon.jsonl"):
     kept = []
 
     # A product ID with contradictory gold labels is ambiguous and is excluded
-    # entirely. Consistent duplicate IDs are collapsed to one most-complete row.
+    # entirely. Consistent duplicates retain the most informative source row.
     for item_id, group in df.groupby("item_id", sort=False):
         if len(group) == 1:
             kept.append(group.index[0])
@@ -57,8 +57,25 @@ def load_data(path="data/final_clean_amazon.jsonl"):
         scores = group[completeness_cols].apply(
             lambda row: sum(bool(_normalise_value(v)) for v in row), axis=1
         )
-        # Stable tie-break: retain the earliest row in source-file order.
-        kept.append(scores.sort_values(ascending=False, kind="stable").index[0])
+        bullet_lengths = group.get(
+            "bullet_points_text", pd.Series("", index=group.index)
+        ).fillna("").astype(str).str.len()
+        title_lengths = group.get(
+            "item_name", pd.Series("", index=group.index)
+        ).fillna("").astype(str).str.len()
+        ranking = pd.DataFrame({
+            "completeness": scores,
+            "bullet_length": bullet_lengths,
+            "title_length": title_lengths,
+        }, index=group.index)
+        # Prefer completeness, then richer source text; stable sort preserves
+        # the earliest source row when all quality signals are tied.
+        selected = ranking.sort_values(
+            ["completeness", "bullet_length", "title_length"],
+            ascending=[False, False, False],
+            kind="stable",
+        ).index[0]
+        kept.append(selected)
 
     df = df.loc[kept].copy().reset_index(drop=True)
     audit = {
