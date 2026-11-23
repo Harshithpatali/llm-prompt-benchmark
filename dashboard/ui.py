@@ -51,7 +51,7 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stHeader"] { background: rgba(11,16,32,.82); }
 [data-testid="stSidebar"] { background: #0e1629; border-right: 1px solid #24314a; }
 [data-testid="stSidebar"] > div { padding-top: 1.3rem; }
-h1,h2,h3 { letter-spacing: -.035em; }
+h1,h2,h3 { color: #f1f5ff !important; letter-spacing: -.035em; }
 h1 { font-size: clamp(1.8rem, 4vw, 2.5rem) !important; font-weight: 750 !important; }
 h2 { font-size: 1.45rem !important; font-weight: 700 !important; }
 h3 { font-size: 1.12rem !important; font-weight: 680 !important; }
@@ -61,7 +61,8 @@ div[data-testid="stMetric"] { background: #121e33; border: 1px solid #2a3a55; bo
 div[data-testid="stMetricLabel"] { color: #aab9d0; }
 div[data-testid="stMetricValue"] { font-weight: 750; color: #f5f8ff !important; }
 .stButton > button, .stDownloadButton > button, [data-testid="stFormSubmitButton"] > button { border-radius: 11px; min-height: 2.8rem; font-weight: 650; border: 1px solid #3b4d6b; }
-.stButton > button[kind="primary"], [data-testid="stFormSubmitButton"] > button[kind="primary"] { background: #5577e8; border-color: #5577e8; color: white; }
+.stButton > button[kind="primary"], [data-testid="stFormSubmitButton"] > button[kind="primary"] { background: #5577e8 !important; border-color: #5577e8 !important; color: #ffffff !important; opacity: 1; }
+[data-testid="stFormSubmitButton"] > button:disabled { opacity: .45; cursor: not-allowed; }
 .stTextInput input, .stTextArea textarea, .stSelectbox [data-baseweb="select"], .stNumberInput input { border-radius: 10px; background: #111c30; }
 [data-testid="stTabs"] button { font-weight: 650; }
 [data-testid="stAlert"] { border-radius: 13px; }
@@ -69,6 +70,7 @@ div[data-testid="stMetricValue"] { font-weight: 750; color: #f5f8ff !important; 
 [data-testid="stDataFrame"] { border: 1px solid #293852; border-radius: 12px; overflow: hidden; }
 .small-muted { color: #9aabc4; font-size: .9rem; }
 .hero { color: #e8eefb !important; padding: 1.25rem 1.4rem; border: 1px solid #2b3b58; border-radius: 20px; background: linear-gradient(120deg, #142544, #111a2e 68%, #17213a); margin: .4rem 0 1.3rem; }
+.hero h1 { color: #f7f9ff !important; margin-top: .35rem; }
 .hero-kicker { color: #9eb8ff; font-size: .76rem; font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
 .hero-copy { color: #b7c5dc; margin-top: .35rem; max-width: 850px; }
 .eyebrow { color: #9eb8ff; font-size: .76rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
