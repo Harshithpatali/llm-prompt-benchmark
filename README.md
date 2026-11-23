@@ -24,6 +24,13 @@ See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limita
 - Paired bootstrap confidence intervals and paired sign tests.
 - Raw JSON results and Markdown research reports.
 
+### General response benchmark
+
+- Runs the 60-case general response benchmark against Groq or OpenRouter-compatible providers.
+- Records response text, latency, token usage, request failures, case IDs, and dataset SHA-256.
+- Produces category-level lexical diagnostics and a Markdown report.
+- Has a manually triggered GitHub Actions workflow for reproducible runs.
+
 ### Quality and reliability analysis
 
 - Validated loaders for the general benchmark and seller-support scenarios.
@@ -52,7 +59,7 @@ See [Dataset Manifest](data/DATASET_MANIFEST.md) for provenance notes and limita
 
 The following remain implementation work:
 
-- Unified benchmark execution across the three dataset families.
+- Seller-support execution and a dedicated human-review interface.
 - Versioned rubrics and task-specific scoring for relevance, correctness, completeness, instruction following, groundedness, and policy compliance.
 - Human annotation UI, task assignment, submissions, and adjudication.
 - Evaluation run/trace persistence using PostgreSQL (Neon is the intended target).
@@ -79,6 +86,7 @@ PROVIDER=groq
 GROQ_API_KEY=your_key
 MODEL_NAME=openai/gpt-oss-20b
 SAMPLE_SIZE=200
+QUALITY_SAMPLE_SIZE=60
 TEST_SIZE=0.20
 DEMO_SIZE=4
 RANDOM_SEED=42
@@ -94,13 +102,20 @@ For OpenRouter, configure `OPENROUTER_API_KEY` and set `PROVIDER=openrouter`.
 pytest -q
 ```
 
-### Run the existing e-commerce prompt benchmark
+### Run the e-commerce prompt benchmark
 
 Live runs call an external model API and may incur provider charges or rate limits.
 
 ```bash
 python -m experiments.run_experiment
 python -m experiments.build_report
+```
+
+### Run the general response benchmark
+
+```bash
+python -m experiments.run_quality_benchmark
+python -m experiments.build_quality_report
 ```
 
 ### Start the API and dashboard

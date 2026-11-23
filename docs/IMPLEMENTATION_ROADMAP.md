@@ -26,7 +26,8 @@ This roadmap separates existing repository capabilities from work still required
 - [x] Add seller-support scenarios as a separate policy/groundedness challenge dataset.
 - [x] Add a validated loader for both datasets.
 - [x] Add lexical reference-overlap diagnostics with explicit semantic limitations.
-- [ ] Add a general benchmark runner with provider execution and run metadata.
+- [x] Add a general benchmark runner with per-case results, category summaries, and failure reporting.
+- [x] Add a Markdown report generator and manual GitHub Actions workflow.
 - [ ] Add versioned rubrics and transparent task-specific score details.
 - [ ] Add RAG evaluation only when retrieval contexts and evidence references are available.
 

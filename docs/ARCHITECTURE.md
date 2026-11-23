@@ -52,13 +52,15 @@ PostgreSQL persistence (Neon target; planned)
 FastAPI service + Streamlit quality dashboard
 ```
 
-## Existing components to preserve
+## Existing components
 
 - `prompts/prompt_templates.py`: prompt strategy registry.
 - `utils/data_loader.py`: e-commerce dataset validation and leakage-aware splitting.
 - `evaluation/metrics.py`: extraction metrics and paired statistical comparisons.
 - `evaluation/llm_judge.py`: optional supplementary judge for extraction examples.
 - `experiments/run_experiment.py`: reproducible extraction experiment.
+- `experiments/run_quality_benchmark.py`: general-response benchmark execution and run artifact creation.
+- `experiments/build_quality_report.py`: Markdown report generation for general-response runs.
 - `backend/main.py`: current extraction API baseline.
 - `dashboard/app.py`: current Streamlit dashboard baseline.
 - `backend/calibration.py`: reviewer/judge reliability and validation/holdout threshold calibration.
@@ -70,11 +72,11 @@ FastAPI service + Streamlit quality dashboard
 
 ## Components still to integrate
 
-- General benchmark execution and task-specific rubric scoring.
-- Rubric generation and versioning.
+- Seller-support execution and the human review interface.
+- Versioned rubrics and general task-specific rubric scoring.
 - Human annotation task assignment, submissions, and adjudication.
 - Evaluation traces, review queues, audit history, and operational persistence.
-- Provider abstraction reconciled with the current prompt-benchmark API client.
+- A provider abstraction reconciled with the current prompt-benchmark API client.
 
 The companion quality-intelligence source contains Supabase-specific data access and API orchestration. Treat its schemas and contracts as references; do not copy its Supabase persistence code unchanged.
 
@@ -116,12 +118,6 @@ Use foreign keys, uniqueness constraints, indexes, and transaction boundaries. K
 FastAPI owns validated request handling, model execution orchestration, run retrieval, annotations, and quality-operation endpoints. Streamlit is a client of the API and presents run comparison, failure exploration, reviewer work, calibration, and history.
 
 Avoid duplicating evaluation logic inside Streamlit. Offline experiments and API workflows should call the same service-layer evaluators.
-
-## Metric governance
-
-Metrics are task-specific. Product attribute exact match, support-policy rubric scores, and RAG faithfulness are not interchangeable. Store each with its definition, scale, evaluator version, and task family.
-
-Automated judge outputs remain advisory until compared against independent human labels. Select calibration thresholds on validation labels only, freeze them, and evaluate once on an untouched holdout. Report class support, confusion matrices, and limitations alongside agreement statistics.
 
 ## Deployment
 

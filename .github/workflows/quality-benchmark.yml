@@ -1,0 +1,62 @@
+name: General LLM quality benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_size:
+        description: Number of general benchmark cases to run
+        required: true
+        type: number
+        default: 60
+      provider:
+        description: LLM provider
+        required: true
+        type: choice
+        options: [groq, openrouter]
+        default: groq
+
+permissions:
+  contents: read
+
+concurrency:
+  group: general-quality-benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run general response benchmark
+        env:
+          PROVIDER: ${{ inputs.provider }}
+          MODEL_NAME: ${{ inputs.provider == 'groq' && 'openai/gpt-oss-20b' || 'meta-llama/llama-3.1-8b-instruct' }}
+          QUALITY_SAMPLE_SIZE: ${{ inputs.sample_size }}
+          TEMPERATURE: "0"
+          MAX_TOKENS: "512"
+          RETRY_LIMIT: "3"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python -m experiments.run_quality_benchmark
+      - name: Build research report
+        run: python -m experiments.build_quality_report
+      - name: Upload raw results and report
+        uses: actions/upload-artifact@v4
+        with:
+          name: general-quality-benchmark-${{ github.run_number }}
+          path: |
+            results/quality_*.json
+            reports/quality_*.md
+          if-no-files-found: error
+          retention-days: 90
