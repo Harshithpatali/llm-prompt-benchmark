@@ -4,6 +4,13 @@ import requests
 import streamlit as st
 
 st.set_page_config(page_title="Human Quality Review", page_icon="🧪", layout="wide")
+import sys
+from pathlib import Path
+DASHBOARD_DIR = Path(__file__).resolve().parents[1]
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.insert(0, str(DASHBOARD_DIR))
+from ui import apply_theme, page_header
+apply_theme()
 API_URL = os.getenv("API_BASE_URL", "https://llm-prompt-benchmark.onrender.com").rstrip("/")
 
 
@@ -27,8 +34,7 @@ def api(method, path, **kwargs):
     return response.json() if response.content else {}
 
 
-st.title("🧪 Human Quality Review")
-st.caption("Inspect an assistant answer, compare it with the supplied context and guidance, then submit an evidence-backed assessment.")
+page_header("Human evaluation", "Human Quality Review", "Inspect candidate answers against their context, record evidence-backed assessments and submit consistent quality labels.")
 
 with st.sidebar:
     st.subheader("Reviewer settings")
