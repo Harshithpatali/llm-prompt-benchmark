@@ -4,9 +4,10 @@ import os
 from pathlib import Path
 from typing import Any
 from uuid import UUID
+import hmac
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
@@ -75,6 +76,15 @@ class AnnotationSubmission(BaseModel):
     escalated: bool | None = None
     defect_category: str = Field(default="none", min_length=1, max_length=120)
     is_audit: bool = False
+
+
+def require_review_api_key(x_review_api_key: str | None = Header(default=None)) -> None:
+    """Protect reviewer operations with a shared secret configured at deployment."""
+    expected = os.getenv("REVIEW_API_KEY", "").strip()
+    if not expected:
+        raise HTTPException(503, "Review API is disabled until REVIEW_API_KEY is configured")
+    if not x_review_api_key or not hmac.compare_digest(x_review_api_key, expected):
+        raise HTTPException(401, "Invalid or missing review API key")
 
 
 def _database_http_error(exc: Exception) -> HTTPException:
@@ -183,7 +193,7 @@ def get_quality_run(run_id: UUID):
     return result
 
 
-@app.post("/quality/review-tasks/seed", status_code=201)
+@app.post("/quality/review-tasks/seed", status_code=201, dependencies=[Depends(require_review_api_key)])
 def seed_review_tasks():
     """Idempotently import the repository's 16 authored seller-support examples."""
     try:
@@ -195,7 +205,7 @@ def seed_review_tasks():
         raise _database_http_error(exc) from exc
 
 
-@app.get("/quality/review-tasks")
+@app.get("/quality/review-tasks", dependencies=[Depends(require_review_api_key)])
 def list_review_tasks(
     status: str | None = Query(default="pending", pattern="^(pending|claimed|submitted|adjudicated|cancelled)$"),
     limit: int = Query(default=50, ge=1, le=200),
@@ -207,7 +217,7 @@ def list_review_tasks(
         raise _database_http_error(exc) from exc
 
 
-@app.post("/quality/review-tasks/{task_id}/annotations", status_code=201)
+@app.post("/quality/review-tasks/{task_id}/annotations", status_code=201, dependencies=[Depends(require_review_api_key)])
 def submit_review_annotation(task_id: UUID, submission: AnnotationSubmission):
     task = {"review_task_id": str(task_id)}
     try:
@@ -219,7 +229,7 @@ def submit_review_annotation(task_id: UUID, submission: AnnotationSubmission):
         raise _database_http_error(exc) from exc
 
 
-@app.get("/quality/annotations")
+@app.get("/quality/annotations", dependencies=[Depends(require_review_api_key)])
 def list_quality_annotations(limit: int = Query(default=100, ge=1, le=500),
                              offset: int = Query(default=0, ge=0, le=100000)):
     try:
