@@ -14,6 +14,13 @@ if str(REPO_ROOT) not in sys.path:
 from backend.rubric_qa import validate_csv
 
 st.set_page_config(page_title="Rubric Studio", page_icon="🧩", layout="wide")
+import sys
+from pathlib import Path
+DASHBOARD_DIR = Path(__file__).resolve().parents[1]
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.insert(0, str(DASHBOARD_DIR))
+from ui import apply_theme, page_header
+apply_theme()
 API_URL = os.getenv("API_BASE_URL", "https://llm-prompt-benchmark.onrender.com").rstrip("/")
 DEFAULT_MODEL = os.getenv("MODEL_NAME", "openai/gpt-oss-20b")
 
@@ -51,8 +58,7 @@ def show_request_error(exc):
         st.info("The API reached the model provider but generation failed. Check the Render API logs for the upstream provider response.")
 
 
-st.title("🧩 Rubric Studio")
-st.caption("Turn a scenario into a traceable evaluation rubric, approve a version, then score candidate responses against it.")
+page_header("Evaluation design", "Rubric Studio", "Generate traceable criteria from a scenario, validate coverage, manage approved versions and evaluate candidate responses.")
 
 with st.sidebar:
     st.subheader("Generation settings")
