@@ -60,6 +60,7 @@ def run_strategy(name,fn,test,demos,client,model):
 def main():
     provider=os.getenv("PROVIDER","groq").lower(); model=os.getenv("MODEL_NAME",DEFAULT_MODELS.get(provider,""))
     seed=int(os.getenv("RANDOM_SEED","42")); df=load_data(os.getenv("DATA_PATH","data/final_clean_amazon.jsonl"))
+    duplicate_audit=df.attrs.get("duplicate_audit", {})
     train,demo_df,test=split_data(df,float(os.getenv("TEST_SIZE",".2")),int(os.getenv("DEMO_SIZE","4")),seed)
     size=int(os.getenv("SAMPLE_SIZE","200"))
     if size>0: test=test.sample(n=min(size,len(test)),random_state=seed).sort_index()
@@ -83,7 +84,8 @@ def main():
                 comparisons[item["strategy"]]={"paired_bootstrap":paired_bootstrap_ci(item["row_exact_match"],baseline["row_exact_match"]),
                     "paired_sign_test":paired_sign_test(item["row_exact_match"],baseline["row_exact_match"])}
         payload={"metadata":{"provider":provider,"model":model,"seed":seed,"dataset_rows":len(df),
-            "train_rows":len(train),"demo_ids":demo_df.item_id.astype(str).tolist(),
+            "train_rows":len(train),"duplicate_audit":duplicate_audit,
+            "demo_ids":demo_df.item_id.astype(str).tolist(),
             "test_ids":test.item_id.astype(str).tolist(),"timestamp_utc":datetime.now(timezone.utc).isoformat(),
             "unsupported_metric_note":"Lexical evidence heuristic, not semantic fact checking."},
             "results":results,"paired_comparisons_vs_zero_shot":comparisons}
