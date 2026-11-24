@@ -181,6 +181,17 @@ def generate_rubric(req: RubricGenerateRequest):
         )
         raw = response.choices[0].message.content or ""
         csv_text, qa = parse_and_validate(raw)
+        logger.info(
+            "Rubric generation completed (provider=%s, model=%s, finish_reason=%s, "
+            "response_chars=%s, qa_status=%s, qa_counts=%s)",
+            req.provider, model, response.choices[0].finish_reason,
+            len(raw), qa.get("status"), qa.get("counts"),
+        )
+        if qa.get("status") == "FAIL":
+            logger.warning(
+                "Rubric output failed deterministic QA (provider=%s, model=%s, issues=%s)",
+                req.provider, model, qa.get("issues", [])[:8],
+            )
         return {"provider": req.provider, "model": model, "csv": csv_text, "qa": qa}
     except HTTPException:
         raise
