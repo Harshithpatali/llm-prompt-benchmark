@@ -171,7 +171,7 @@ def _client(provider: str):
 def generate_rubric(req: RubricGenerateRequest):
     """Generate a rubric from the checked-in framework and return deterministic QA."""
     prompt = build_generation_prompt(req.scenario)
-    model = req.model or (os.getenv("GEMINI_MODEL", "gemini-2.5-flash") if req.provider == "gemini" else os.getenv("MODEL_NAME", "openai/gpt-oss-20b"))
+    model = req.model or (os.getenv("GEMINI_MODEL", "gemini-3.8-flash") if req.provider == "gemini" else os.getenv("MODEL_NAME", "openai/gpt-oss-20b"))
     try:
         response = _client(req.provider).chat.completions.create(
             model=model,
