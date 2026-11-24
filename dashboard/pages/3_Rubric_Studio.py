@@ -94,7 +94,7 @@ with tab_build:
             key="rubric_provider_choice",
         )
     model_options = {
-        "gemini": ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "Custom model…"],
+        "gemini": ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-4-argon", "Custom model…"],
         "groq": ["openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "Custom model…"],
         "openrouter": ["openai/gpt-oss-20b", "google/gemini-2.5-flash", "anthropic/claude-sonnet-4", "Custom model…"],
     }
@@ -110,7 +110,7 @@ with tab_build:
         model = st.text_input(
             "Custom model ID",
             value=(
-                os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+                os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
                 if provider == "gemini" else DEFAULT_MODEL
             ),
             key=f"rubric_custom_model_{provider}",
