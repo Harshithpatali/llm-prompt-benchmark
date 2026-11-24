@@ -61,26 +61,9 @@ def show_request_error(exc):
 page_header("Evaluation design", "Rubric Studio", "Generate traceable criteria from a scenario, validate coverage, manage approved versions and evaluate candidate responses.")
 
 with st.sidebar:
-    st.subheader("Generation settings")
-    provider = st.selectbox(
-        "Model provider", ["groq", "openrouter", "gemini"],
-        index=0,
-        format_func=lambda value: {"groq": "Groq", "openrouter": "OpenRouter", "gemini": "Google Gemini"}[value],
-        help="Choose a provider whose API key is configured on the Render backend.",
-    )
-    default_model = (
-        os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-        if provider == "gemini" else DEFAULT_MODEL
-    )
-    model = st.text_input("Model ID", value=default_model,
-                          help="Gemini default: gemini-2.5-flash. You can override it if your API project supports another model.")
-    st.divider()
-    st.caption("Rubric generation uses the selected provider configured on the Render API. The framework and QA rules are built in.")
-    if provider == "gemini":
-        st.info("Add GEMINI_API_KEY to the Render API environment. Do not paste the key into this dashboard or the review API key field.")
+    st.subheader("Reviewer access")
+    st.caption("This key protects write actions. It is not needed to generate a rubric.")
     if not secret("REVIEW_API_KEY"):
-        st.markdown("**Reviewer access**")
-        st.caption("This key protects write actions across the platform. It is not needed to generate a rubric.")
         entered = st.text_input(
             "Review API key",
             type="password",
@@ -100,6 +83,49 @@ except Exception:
 tab_build, tab_library, tab_evaluate = st.tabs(["① Build a rubric", "② Rubric library", "③ Evaluate a response"])
 
 with tab_build:
+    st.subheader("Choose your generation model")
+    st.caption("Select the provider and exact model here before generating. The API key stays securely on Render.")
+    model_col1, model_col2 = st.columns(2)
+    with model_col1:
+        provider = st.selectbox(
+            "Model provider",
+            ["gemini", "groq", "openrouter"],
+            format_func=lambda value: {"gemini": "Google Gemini", "groq": "Groq", "openrouter": "OpenRouter"}[value],
+            key="rubric_provider_choice",
+        )
+    model_options = {
+        "gemini": ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "Custom model…"],
+        "groq": ["openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "Custom model…"],
+        "openrouter": ["openai/gpt-oss-20b", "google/gemini-2.5-flash", "anthropic/claude-sonnet-4", "Custom model…"],
+    }
+    with model_col2:
+        selected_model = st.selectbox(
+            "Model",
+            model_options[provider],
+            index=0,
+            key=f"rubric_model_choice_{provider}",
+            help="Choose a model supported by the selected provider.",
+        )
+    if selected_model == "Custom model…":
+        model = st.text_input(
+            "Custom model ID",
+            value=(
+                os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+                if provider == "gemini" else DEFAULT_MODEL
+            ),
+            key=f"rubric_custom_model_{provider}",
+            help="Enter the exact model ID accepted by your provider.",
+        )
+    else:
+        model = selected_model
+    if provider == "gemini":
+        st.info("Google Gemini uses GEMINI_API_KEY configured on Render. Do not enter the key here.")
+    elif provider == "groq":
+        st.info("Groq uses GROQ_API_KEY configured on Render.")
+    else:
+        st.info("OpenRouter uses OPENROUTER_API_KEY configured on Render.")
+
+    st.divider()
     st.subheader("Describe what the assistant must do")
     st.write("Paste the system prompt, task instructions, constraints, edge cases and expected output requirements. The generator turns them into atomic criteria.")
     with st.form("rubric_generation_form"):
