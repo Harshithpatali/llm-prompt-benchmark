@@ -63,3 +63,28 @@ def test_generator_replaces_model_overall_rows_with_canonical_reference():
     assert parsed[-1][0]=="O14"
     assert parsed[-1][3]==OVERALL_ROWS[-1][2]
     assert validate_csv(rebuilt)["status"]=="PASS"
+
+
+def test_generator_normalizes_unquoted_csv_with_preamble():
+    rows = list(csv.reader(io.StringIO(make_csv())))
+    out = io.StringIO()
+    csv.writer(out).writerows(rows)
+    raw = "Here is the requested rubric:\\n\\n" + out.getvalue()
+    from backend.rubric_generator import parse_and_validate
+    normalized, report = parse_and_validate(raw)
+    assert list(csv.reader(io.StringIO(normalized)))[0] == HEADERS
+    assert report["counts"]["atomic_components"] == 50
+    assert report["counts"]["overall_components"] == 14
+    assert report["status"] == "PASS"
+
+
+def test_generator_normalizes_markdown_pipe_table():
+    rows = list(csv.reader(io.StringIO(make_csv())))
+    markdown = "|" + "|".join(rows[0]) + "|\\n"
+    markdown += "|" + "|".join(["---"] * 9) + "|\\n"
+    markdown += "\\n".join("|" + "|".join(row) + "|" for row in rows[1:])
+    from backend.rubric_generator import parse_and_validate
+    normalized, report = parse_and_validate(markdown)
+    assert list(csv.reader(io.StringIO(normalized)))[0] == HEADERS
+    assert report["counts"]["atomic_components"] == 50
+    assert report["status"] == "PASS"
