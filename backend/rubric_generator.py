@@ -53,21 +53,64 @@ SCENARIO:
 """
 
 def normalize_csv(raw: str) -> str:
-    text = (raw or "").strip()
-    if text.startswith("\`\`\`"):
-        lines = text.splitlines()
-        if lines and lines[0].startswith("\`\`\`"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "\`\`\`":
-            lines = lines[:-1]
-        text = "\n".join(lines).strip()
-    # Strip accidental prose only when a valid header line can be located.
+    """Extract a nine-column CSV table and normalize harmless formatting.
+
+    Models sometimes wrap CSV in prose/fences or omit CSV quoting. We only
+    normalize when the header cells match the canonical schema exactly after
+    trimming whitespace; we never guess or rename columns.
+    """
+    text = (raw or "").replace("\\ufeff", "").strip()
+    if not text:
+        return "\\n"
     lines = text.splitlines()
-    header = ",".join(f'"{h}"' for h in HEADERS)
-    start = next((i for i,line in enumerate(lines) if line.strip()==header), None)
+    # First try to locate a canonical CSV header, even if it is inside a fence
+    # or preceded by a short explanation.
+    start = None
+    for i, line in enumerate(lines):
+        candidate = line.strip()
+        if candidate.startswith("```"):
+            continue
+        try:
+            cells = next(csv.reader([candidate], strict=True))
+        except (csv.Error, StopIteration):
+            continue
+        if [cell.strip() for cell in cells] == HEADERS:
+            start = i
+            break
     if start is not None:
-        text = "\n".join(lines[start:])
-    return text + "\n"
+        candidate_text = "\\n".join(lines[start:])
+        try:
+            rows = list(csv.reader(io.StringIO(candidate_text), strict=True))
+        except csv.Error:
+            rows = []
+        if rows and [cell.strip() for cell in rows[0]] == HEADERS:
+            output = io.StringIO()
+            writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\\n")
+            writer.writerow(HEADERS)
+            for row in rows[1:]:
+                if not row or all(not cell.strip() for cell in row):
+                    continue
+                writer.writerow([cell.strip() for cell in row])
+            return output.getvalue()
+    # Support Markdown pipe tables only when the header exactly matches.
+    for i, line in enumerate(lines):
+        candidate = line.strip().strip("|")
+        cells = [cell.strip() for cell in candidate.split("|")]
+        if cells == HEADERS:
+            output = io.StringIO()
+            writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\\n")
+            writer.writerow(HEADERS)
+            for data_line in lines[i + 1:]:
+                data_line = data_line.strip()
+                if not data_line or set(data_line.replace("|", "").replace(":", "").replace("-", "").strip()) == set():
+                    continue
+                if not data_line.startswith("|"):
+                    break
+                values = [cell.strip() for cell in data_line.strip("|").split("|")]
+                if len(values) == 9:
+                    writer.writerow(values)
+            return output.getvalue()
+    return text + "\\n"
 
 def append_canonical_overall_rows(raw: str) -> str:
     """Replace any model-generated O rows with the immutable QA reference rows."""
