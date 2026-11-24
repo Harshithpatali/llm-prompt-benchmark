@@ -164,7 +164,7 @@ def _client(provider: str):
     key, base = configs[provider]
     if not os.getenv(key):
         raise HTTPException(503, key + " is not configured")
-    return OpenAI(api_key=os.getenv(key), base_url=base)
+    return OpenAI(api_key=os.getenv(key), base_url=base, max_retries=5, timeout=90.0)
 
 
 @app.post("/rubrics/generate")
