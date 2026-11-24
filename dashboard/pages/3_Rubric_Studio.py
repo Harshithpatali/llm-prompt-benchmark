@@ -89,13 +89,13 @@ with tab_build:
     with model_col1:
         provider = st.selectbox(
             "Model provider",
-            ["gemini", "groq", "openrouter"],
+            ["groq", "gemini", "openrouter"],
             format_func=lambda value: {"gemini": "Google Gemini", "groq": "Groq", "openrouter": "OpenRouter"}[value],
             key="rubric_provider_choice",
         )
     model_options = {
         "gemini": ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-4-argon", "Custom model…"],
-        "groq": ["openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "Custom model…"],
+        "groq": ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b", "Custom model…"],
         "openrouter": ["openai/gpt-oss-20b", "google/gemini-2.5-flash", "anthropic/claude-sonnet-4", "Custom model…"],
     }
     with model_col2:
